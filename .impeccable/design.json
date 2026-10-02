@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-02T12:00:00Z",
+  "title": "Design System: Kuku arhiiv",
+  "extensions": {
+    "colorMeta": {
+      "bg": { "role": "neutral", "displayName": "Studio Black", "canonical": "#0f0f10", "tonalRamp": ["#0f0f10", "#1b1b1d", "#26262a", "#323237", "#4a4a50", "#6b6b72", "#a3a3a9", "#e8e8ea"] },
+      "surface": { "role": "neutral", "displayName": "Booth Grey", "canonical": "#1b1b1d", "tonalRamp": ["#0f0f10", "#1b1b1d", "#26262a", "#323237", "#4a4a50", "#6b6b72", "#a3a3a9", "#e8e8ea"] },
+      "surface-2": { "role": "neutral", "displayName": "Console Grey", "canonical": "#26262a", "tonalRamp": ["#0f0f10", "#1b1b1d", "#26262a", "#323237", "#4a4a50", "#6b6b72", "#a3a3a9", "#e8e8ea"] },
+      "surface-3": { "role": "neutral", "displayName": "Fader Grey", "canonical": "#323237", "tonalRamp": ["#0f0f10", "#1b1b1d", "#26262a", "#323237", "#4a4a50", "#6b6b72", "#a3a3a9", "#e8e8ea"] },
+      "line": { "role": "neutral", "displayName": "Hairline", "canonical": "#34343a", "tonalRamp": ["#121214", "#1d1d21", "#28282d", "#34343a", "#4c4c54", "#6d6d76", "#a4a4ab", "#e8e8eb"] },
+      "text": { "role": "neutral", "displayName": "Paper White", "canonical": "#f4f3ef", "tonalRamp": ["#22211e", "#3b3a36", "#57554f", "#8e8c86", "#b9b7b0", "#d6d4ce", "#e9e8e3", "#f4f3ef"] },
+      "text-2": { "role": "neutral", "displayName": "Warm Ash", "canonical": "#b9b7b0", "tonalRamp": ["#22211e", "#3b3a36", "#57554f", "#8e8c86", "#b9b7b0", "#d6d4ce", "#e9e8e3", "#f4f3ef"] },
+      "text-3": { "role": "neutral", "displayName": "Dim Ash", "canonical": "#8e8c86", "tonalRamp": ["#22211e", "#3b3a36", "#57554f", "#8e8c86", "#b9b7b0", "#d6d4ce", "#e9e8e3", "#f4f3ef"] },
+      "accent": { "role": "primary", "displayName": "Dial Lamp Amber", "canonical": "#f5b73b", "tonalRamp": ["#2b2416", "#4a3815", "#7a5a12", "#b5841c", "#e0a225", "#f5b73b", "#ffc552", "#ffe9b8"] },
+      "accent-hover": { "role": "primary", "displayName": "Lamp Glow", "canonical": "#ffc552", "tonalRamp": ["#2b2416", "#4a3815", "#7a5a12", "#b5841c", "#e0a225", "#f5b73b", "#ffc552", "#ffe9b8"] },
+      "accent-press": { "role": "primary", "displayName": "Lamp Ember", "canonical": "#e0a225", "tonalRamp": ["#2b2416", "#4a3815", "#7a5a12", "#b5841c", "#e0a225", "#f5b73b", "#ffc552", "#ffe9b8"] },
+      "on-accent": { "role": "primary", "displayName": "Burnt Filament", "canonical": "#1a1406", "tonalRamp": ["#1a1406", "#2b2416", "#4a3815", "#7a5a12", "#b5841c", "#e0a225", "#f5b73b", "#ffe9b8"] },
+      "amber-dusk": { "role": "secondary", "displayName": "Amber Dusk", "canonical": "#2a2318", "tonalRamp": ["#15110b", "#20190d", "#2a2318", "#2b2416", "#4a3815", "#7a5a12", "#b5841c", "#f5b73b"] },
+      "danger": { "role": "status", "displayName": "Signal Coral", "canonical": "#ff7a6b", "tonalRamp": ["#2a0f0c", "#3a1612", "#5c231c", "#a8443a", "#e2604f", "#ff7a6b", "#ffc4ba", "#ffd9d3"] },
+      "danger-surface": { "role": "status", "displayName": "Oxide Red", "canonical": "#3a1612", "tonalRamp": ["#2a0f0c", "#3a1612", "#5c231c", "#a8443a", "#e2604f", "#ff7a6b", "#ffc4ba", "#ffd9d3"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Show page title beside its cover; auth title at 2rem." },
+      "headline": { "displayName": "Headline", "purpose": "Time-of-day greeting on Home; 2.25rem at 720px+." },
+      "title": { "displayName": "Title", "purpose": "Section h2 headings, empty-state heading, now-playing episode title." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and prose, capped at 46-65ch." },
+      "body-strong": { "displayName": "Body strong", "purpose": "Episode, tile, result and resume titles; pill labels." },
+      "label": { "displayName": "Label", "purpose": "Metadata lines, tab labels, sheet header label, tabular scrub times." }
+    },
+    "shadows": [
+      { "name": "cover-lift", "value": "0 6px 18px rgba(0, 0, 0, .35)", "purpose": "Medium covers and grid tiles; lifts square artwork off the dark ground." },
+      { "name": "cover-hero", "value": "0 18px 50px rgba(0, 0, 0, .55)", "purpose": "Large cover on the now-playing sheet." },
+      { "name": "floating-player", "value": "0 10px 30px rgba(0, 0, 0, .5)", "purpose": "Mini player floating above the tab bar." },
+      { "name": "focus-ring", "value": "outline: 2px solid #f5b73b; outline-offset: 2px", "purpose": "Global :focus-visible treatment." },
+      { "name": "search-focus", "value": "0 0 0 3px #f5b73b", "purpose": "Inverted search field focus-within ring." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default easing for press scale and the sheet opening." },
+      { "name": "ease-in-exit", "value": "cubic-bezier(.7, 0, .84, 0)", "purpose": "Sheet closing downward." },
+      { "name": "state", "value": "150ms", "purpose": "Color, background and press-scale transitions." },
+      { "name": "sheet-up", "value": "420ms translateY(100%) -> 0", "purpose": "Now-playing sheet opens bottom-up on one axis." },
+      { "name": "sheet-down", "value": "280ms translateY(0) -> 100%", "purpose": "Now-playing sheet closes downward." },
+      { "name": "press-scale", "value": "scale(.94) play, scale(.97) pill", "purpose": "Tactile press feedback on round buttons." }
+    ],
+    "breakpoints": [
+      { "name": "wide", "value": "720px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Play Button",
+      "kind": "button",
+      "refersTo": "button-play",
+      "description": "Primary listening action; amber circle with a filled play glyph.",
+      "html": "<button class=\"ds-play\" aria-label=\"Esita\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 5.5v13a1 1 0 0 0 1.52.85l10.4-6.5a1 1 0 0 0 0-1.7L9.52 4.65A1 1 0 0 0 8 5.5z\"/></svg></button>",
+      "css": ".ds-play { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer; background: #f5b73b; color: #1a1406; transition: transform .15s cubic-bezier(0.16, 1, 0.3, 1), background .15s; } .ds-play svg { width: 22px; height: 22px; } .ds-play:hover { background: #ffc552; } .ds-play:active { transform: scale(.94); background: #e0a225; } .ds-play:focus-visible { outline: 2px solid #f5b73b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Pill",
+      "kind": "button",
+      "refersTo": "button-pill-primary",
+      "description": "Save a show or start a search; amber-filled pill.",
+      "html": "<button class=\"ds-pill ds-pill--primary\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg> Salvesta</button>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 18px; border-radius: 999px; font: 700 .9375rem Figtree, system-ui, sans-serif; border: 1px solid #8e8c86; color: #f4f3ef; background: none; cursor: pointer; transition: border-color .15s, background .15s, transform .15s cubic-bezier(0.16, 1, 0.3, 1); } .ds-pill svg { width: 18px; height: 18px; } .ds-pill:active { transform: scale(.97); } .ds-pill:focus-visible { outline: 2px solid #f5b73b; outline-offset: 2px; } .ds-pill--primary { background: #f5b73b; color: #1a1406; border-color: #f5b73b; } .ds-pill--primary:hover { background: #ffc552; border-color: #ffc552; }"
+    },
+    {
+      "name": "Outline Pill",
+      "kind": "button",
+      "refersTo": "button-pill",
+      "description": "Secondary action such as saving from a search result.",
+      "html": "<button class=\"ds-pill-o\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg> Salvesta</button>",
+      "css": ".ds-pill-o { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 18px; border-radius: 999px; font: 700 .9375rem Figtree, system-ui, sans-serif; border: 1px solid #8e8c86; color: #f4f3ef; background: #0f0f10; cursor: pointer; transition: border-color .15s, transform .15s cubic-bezier(0.16, 1, 0.3, 1); } .ds-pill-o svg { width: 18px; height: 18px; } .ds-pill-o:hover { border-color: #f4f3ef; } .ds-pill-o:active { transform: scale(.97); } .ds-pill-o:focus-visible { outline: 2px solid #f5b73b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "button-icon",
+      "description": "Circular 44px icon action (logout, close sheet, skip).",
+      "html": "<button class=\"ds-icon-btn\" aria-label=\"Logi välja\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3\"/><path d=\"M10 17l-5-5 5-5M5 12h11\"/></svg></button>",
+      "css": ".ds-icon-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 0; background: none; cursor: pointer; color: #b9b7b0; transition: color .15s, background .15s; } .ds-icon-btn svg { width: 22px; height: 22px; } .ds-icon-btn:hover { color: #f4f3ef; background: #26262a; } .ds-icon-btn:focus-visible { outline: 2px solid #f5b73b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Inverted light search field with amber focus ring.",
+      "html": "<label class=\"ds-search\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m20 20-4.6-4.6\"/></svg><input placeholder=\"Saate nimi\"></label>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 10px; background: #f4f3ef; color: #1b1b1d; } .ds-search svg { width: 22px; height: 22px; flex: none; } .ds-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font: 600 1rem Figtree, system-ui, sans-serif; color: #121212; caret-color: #121212; } .ds-search input::placeholder { color: #5d5b56; font-weight: 500; } .ds-search:focus-within { box-shadow: 0 0 0 3px #f5b73b; }"
+    },
+    {
+      "name": "Form Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Dark text field used on the sign-in form.",
+      "html": "<label class=\"ds-field\"><span>Parool</span><input type=\"password\"></label>",
+      "css": ".ds-field { display: grid; gap: 6px; color: #f4f3ef; font-family: Figtree, system-ui, sans-serif; } .ds-field span { font-weight: 700; font-size: .875rem; } .ds-field input { height: 50px; padding: 0 14px; border-radius: 10px; background: #1b1b1d; color: #f4f3ef; border: 1px solid #34343a; font: 500 1rem Figtree, system-ui, sans-serif; } .ds-field input:hover { border-color: #8e8c86; } .ds-field input:focus { outline: none; border-color: #f5b73b; box-shadow: 0 0 0 1px #f5b73b; }"
+    },
+    {
+      "name": "Resume Card",
+      "kind": "card",
+      "refersTo": "card-resume",
+      "description": "Continue-listening block: cover, title, show, progress and play.",
+      "html": "<div class=\"ds-resume\"><span class=\"ds-resume__cover\">KK</span><div class=\"ds-resume__text\"><p class=\"ds-resume__title\">Osa pealkiri</p><p class=\"ds-resume__show\">Saate nimi · 28. sept</p><div class=\"ds-resume__bar\"><span></span></div></div><button class=\"ds-resume__play\" aria-label=\"Esita\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M8 5.5v13a1 1 0 0 0 1.52.85l10.4-6.5a1 1 0 0 0 0-1.7L9.52 4.65A1 1 0 0 0 8 5.5z\"/></svg></button></div>",
+      "css": ".ds-resume { display: flex; align-items: center; gap: 14px; padding: 14px; background: linear-gradient(135deg, #2b2416, #1b1b1d 70%); border-radius: 16px; color: #f4f3ef; font-family: Figtree, system-ui, sans-serif; } .ds-resume__cover { flex: none; width: 72px; aspect-ratio: 1; border-radius: 6px; display: grid; place-items: center; font-weight: 800; background: hsl(28 32% 30%); box-shadow: 0 6px 18px rgba(0,0,0,.35); } .ds-resume__text { flex: 1; min-width: 0; } .ds-resume__title { margin: 0; font-weight: 700; font-size: 1.0625rem; line-height: 1.25; } .ds-resume__show { margin: 2px 0 0; color: #b9b7b0; font-size: .875rem; } .ds-resume__bar { height: 4px; border-radius: 2px; background: #323237; margin-top: 10px; overflow: hidden; } .ds-resume__bar span { display: block; height: 100%; width: 40%; background: #f5b73b; } .ds-resume__play { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #f5b73b; color: #1a1406; cursor: pointer; transition: transform .15s cubic-bezier(0.16, 1, 0.3, 1), background .15s; } .ds-resume__play svg { width: 22px; height: 22px; } .ds-resume__play:hover { background: #ffc552; } .ds-resume__play:active { transform: scale(.94); }"
+    },
+    {
+      "name": "Mini Player",
+      "kind": "custom",
+      "refersTo": "mini-player",
+      "description": "Persistent floating player above the tabs; tapping opens the now-playing sheet.",
+      "html": "<div class=\"ds-mini\"><button class=\"ds-mini__open\"><span class=\"ds-mini__cover\"></span><span class=\"ds-mini__text\"><span class=\"ds-mini__title\">Osa pealkiri</span><span class=\"ds-mini__show\">Saate nimi</span></span></button><button class=\"ds-mini__toggle\" aria-label=\"Paus\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><rect x=\"6\" y=\"4.5\" width=\"4\" height=\"15\" rx=\"1.2\"/><rect x=\"14\" y=\"4.5\" width=\"4\" height=\"15\" rx=\"1.2\"/></svg></button><span class=\"ds-mini__progress\"><span></span></span></div>",
+      "css": ".ds-mini { position: relative; display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 6px 0 8px; background: #2a2318; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.5); color: #f4f3ef; font-family: Figtree, system-ui, sans-serif; } .ds-mini__open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 100%; text-align: left; background: none; border: 0; color: inherit; cursor: pointer; font: inherit; } .ds-mini__cover { width: 44px; aspect-ratio: 1; border-radius: 4px; background: #26262a; flex: none; } .ds-mini__text { display: grid; min-width: 0; } .ds-mini__title { font-weight: 700; font-size: .9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-mini__show { color: #b9b7b0; font-size: .8125rem; } .ds-mini__toggle { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 0; background: none; color: #f4f3ef; cursor: pointer; transition: background .15s; } .ds-mini__toggle svg { width: 26px; height: 26px; } .ds-mini__toggle:hover { background: #26262a; } .ds-mini__toggle:focus-visible { outline: 2px solid #f5b73b; outline-offset: 2px; } .ds-mini__progress { position: absolute; left: 10px; right: 10px; bottom: 0; height: 2px; background: rgba(255,255,255,.15); overflow: hidden; } .ds-mini__progress span { display: block; height: 100%; width: 35%; background: #f5b73b; }"
+    },
+    {
+      "name": "Bottom Tabs",
+      "kind": "nav",
+      "refersTo": "nav-tabs",
+      "description": "Fixed bottom navigation: Kodu / Otsi.",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z\"/></svg>Kodu</a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m20 20-4.6-4.6\"/></svg>Otsi</a></nav>",
+      "css": ".ds-tabs { display: flex; justify-content: center; height: 64px; background: linear-gradient(to top, rgba(15,15,16,1) 55%, rgba(15,15,16,.85)); font-family: Figtree, system-ui, sans-serif; } .ds-tabs a { flex: 0 1 180px; display: grid; justify-items: center; align-content: center; gap: 3px; font-size: .75rem; font-weight: 600; color: #8e8c86; text-decoration: none; transition: color .15s; } .ds-tabs a svg { width: 26px; height: 26px; } .ds-tabs a:hover, .ds-tabs a[aria-current=\"page\"] { color: #f4f3ef; } .ds-tabs a:focus-visible { outline: 2px solid #f5b73b; outline-offset: 2px; border-radius: 6px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Radio Dial Lamp in a Dark Room",
+    "overview": "A personal archive dressed in the grammar of a streaming app the user already knows (user-chosen canon: \"Spotify-like\", quality bar the Spotify mobile app). Near-black ground, surfaces one lightness step above it, square cover art doing the visual work, and a persistent player that never leaves the bottom of the screen. Management (adding, removing shows) is secondary and lives in plain pills and lists, never admin tables or settings pages.\n\nOne warm amber, the glow of an old radio dial lamp, is the only color with a voice. At full strength it marks playback and the active state: the play button, progress fills, the current episode, focus. At low strength it tints the dark surfaces that belong to listening (the mini player, the resume card, the now-playing sheet), so \"something is playing\" reads as warmth rather than as a new hue. Phone first (390px), single column, generous 44px+ touch targets; it widens gracefully to a 760px column on desktop.\n\nType is Figtree throughout: heavy 800-weight headings with tight tracking against quiet 400 body text. Icons are drawn inline SVG on one stroke grammar (2 to 2.4 stroke, round caps), with play and pause as the only filled glyphs.",
+    "keyCharacteristics": [
+      "Near-black ground with tonal surface steps; no light theme.",
+      "One amber accent reserved for playback and active state.",
+      "Cover art is the primary visual; generated hue fallbacks when art is missing.",
+      "Fully round buttons (circles and pills); softly rounded containers.",
+      "Persistent mini player + bottom tabs; one-axis bottom-up sheet for now playing.",
+      "Estonian UI copy, plain non-technical language."
+    ],
+    "rules": [
+      { "name": "The Lamp Rule", "body": "Full-strength amber means \"playing / active / act here to listen\". It never decorates headings, tiles, or management chrome; a screen without playback in view carries almost none.", "section": "colors" },
+      { "name": "The Warm Shadow Rule", "body": "Listening surfaces (mini player, resume card, now-playing sheet) may carry a dark amber tint; management surfaces (search, auth, show actions, danger zone) stay neutral grey.", "section": "colors" },
+      { "name": "The No-Green Rule", "body": "Spotify's grammar, never Spotify's brand: no Spotify green, logo, or name, and no Kuku logo or brand imitation.", "section": "colors" },
+      { "name": "The Weight-Not-Case Rule", "body": "Hierarchy comes from weight and size. No uppercase tracked labels, no eyebrow text above headings; section labels are real h2 headings.", "section": "typography" },
+      { "name": "The Tabular Time Rule", "body": "Every running time and speed value uses tabular numerals so it does not jitter while playing.", "section": "typography" },
+      { "name": "The Soft Black Shadow Rule", "body": "Shadows are soft, black, and vertical-only, used under artwork and the floating player. Cards, pills, and inputs are flat.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep full-strength amber (accent) for play buttons, progress, the current episode, the active speed, focus and the primary save action.",
+      "Do make every button a circle or a 999px pill, with a 44px minimum touch target.",
+      "Do let cover art lead; give medium and large covers the soft black lift shadow and use the generated-hue initials fallback when art is missing.",
+      "Do build hierarchy from Figtree weight (800 headings with -0.02 to -0.03em tracking, 700 item titles, 400 body).",
+      "Do draw new icons as inline SVG on a 24px box with 2 to 2.4 stroke and round caps; only play and pause are filled.",
+      "Do reserve the bottom of the viewport for the mini player and tabs, and pad content so nothing hides beneath them.",
+      "Do express urgency (expiry) with weight and an icon, keeping amber for playback.",
+      "Do honor prefers-reduced-motion; motion is short and uses the ease-out curve."
+    ],
+    "donts": [
+      "Don't use Spotify green, the Spotify logo or name, or the Kuku logo and brand look.",
+      "Don't introduce a light theme, a second accent hue, or saturated colors on management surfaces.",
+      "Don't lay out management as admin tables or settings pages; use lists, pills and the search view.",
+      "Don't add uppercase tracked eyebrow labels above headings; section labels are h2 titles.",
+      "Don't put shadows on cards, pills or inputs; depth there is tonal.",
+      "Don't use icon fonts, emoji or text glyphs as icons."
+    ]
+  }
+}

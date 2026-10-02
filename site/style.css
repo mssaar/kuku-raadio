@@ -118,7 +118,6 @@ body.no-chrome .view { padding-bottom: 40px; }
 .icon-btn:hover { color: var(--text); background: var(--surface-2); }
 .icon-btn svg { width: 22px; height: 22px; }
 .icon-btn--lg svg { width: 30px; height: 30px; }
-.icon-btn--ghost { visibility: hidden; }
 
 .pill {
   display: inline-flex; align-items: center; gap: 8px;
