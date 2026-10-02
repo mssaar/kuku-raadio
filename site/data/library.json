@@ -1,3 +1,50 @@
 {
- "shows": []
+ "shows": [
+  {
+   "id": 209,
+   "name": "Digitund",
+   "episodes": [
+    {
+     "id": 309869,
+     "title": "Digitund 28-09-2026",
+     "published_at": "2026-09-28T08:00:00Z",
+     "expires_at": "2027-03-29T08:00:00Z",
+     "duration_seconds": 2796.5,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/309869.mp3"
+    },
+    {
+     "id": 309866,
+     "title": "Digitund 21-09-2026",
+     "published_at": "2026-09-21T08:00:00Z",
+     "expires_at": "2027-03-22T08:00:00Z",
+     "duration_seconds": 2745.9,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/309866.mp3"
+    },
+    {
+     "id": 309863,
+     "title": "Kas AI leiutas ravimi vananemise vastu?",
+     "published_at": "2026-09-14T08:00:00Z",
+     "expires_at": "2027-03-15T08:00:00Z",
+     "duration_seconds": 2778.2,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/309863.mp3"
+    },
+    {
+     "id": 309860,
+     "title": "Digitund 07-09-2026",
+     "published_at": "2026-09-07T08:00:00Z",
+     "expires_at": "2027-03-08T08:00:00Z",
+     "duration_seconds": 2925.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/309860.mp3"
+    },
+    {
+     "id": 309857,
+     "title": "Digitund 31-08-2026",
+     "published_at": "2026-08-31T08:00:00Z",
+     "expires_at": "2027-03-01T08:00:00Z",
+     "duration_seconds": 2951.8,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/309857.mp3"
+    }
+   ]
+  }
+ ]
 }
