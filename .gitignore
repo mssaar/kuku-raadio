@@ -2,3 +2,5 @@ recordings/
 __pycache__/
 .pytest_cache/
 .superpowers/
+.impeccable/review/
+.impeccable/build/

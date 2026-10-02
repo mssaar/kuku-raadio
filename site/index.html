@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f10">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex">
+  <title>Kuku arhiiv</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div id="banner" class="banner" role="alert" hidden></div>
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <section id="mini" class="mini" hidden aria-label="Pleier">
+    <button class="mini__open" id="mini-open" aria-label="Ava pleier">
+      <span class="cover cover--sm" id="mini-cover"></span>
+      <span class="mini__text">
+        <span class="mini__title" id="mini-title"></span>
+        <span class="mini__show" id="mini-show"></span>
+      </span>
+    </button>
+    <button class="icon-btn mini__toggle" id="mini-toggle" aria-label="Esita"></button>
+    <span class="mini__progress" aria-hidden="true"><span id="mini-bar"></span></span>
+  </section>
+
+  <nav id="tabs" class="tabs" hidden aria-label="Peamenüü">
+    <a href="#/" data-tab="home"><span class="tabs__icon" data-icon="home"></span>Kodu</a>
+    <a href="#/otsi" data-tab="search"><span class="tabs__icon" data-icon="search"></span>Otsi</a>
+  </nav>
+
+  <section id="sheet" class="sheet" hidden aria-label="Praegu mängib" role="dialog" aria-modal="true">
+    <header class="sheet__head">
+      <button class="icon-btn" id="sheet-close" aria-label="Sulge pleier"></button>
+      <span class="sheet__label">Praegu mängib</span>
+      <span class="icon-btn icon-btn--ghost" aria-hidden="true"></span>
+    </header>
+    <div class="sheet__art cover cover--xl" id="sheet-cover"></div>
+    <div class="sheet__meta">
+      <h2 class="sheet__title" id="sheet-title"></h2>
+      <a class="sheet__show" id="sheet-show" href="#/"></a>
+    </div>
+    <div class="scrub">
+      <input type="range" id="scrub" min="0" max="100" step="1" value="0" aria-label="Asukoht saates">
+      <div class="scrub__times"><span id="t-now">0:00</span><span id="t-left">0:00</span></div>
+    </div>
+    <div class="transport">
+      <button class="speed" id="speed" aria-label="Kiirus">1×</button>
+      <button class="icon-btn icon-btn--lg" id="back" aria-label="15 sekundit tagasi"></button>
+      <button class="play play--xl" id="sheet-toggle" aria-label="Esita"></button>
+      <button class="icon-btn icon-btn--lg" id="fwd" aria-label="30 sekundit edasi"></button>
+      <span class="speed speed--ghost" aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <audio id="audio" preload="none"></audio>
+</body>
+</html>
