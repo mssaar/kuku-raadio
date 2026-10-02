@@ -41,7 +41,9 @@ def test_list_assets_maps_names():
     s = FakeSession([("GET", "/releases/1/assets", Resp(200, [
         {"id": 5, "name": "77.mp3", "browser_download_url": "https://gh/77.mp3"}]))])
     assets = GitHubClient("o/r", "t", s).list_assets({"id": 1})
-    assert assets == {"77.mp3": {"id": 5, "browser_download_url": "https://gh/77.mp3"}}
+    assert list(assets) == ["77.mp3"]
+    assert assets["77.mp3"]["id"] == 5
+    assert assets["77.mp3"]["browser_download_url"] == "https://gh/77.mp3"
 
 
 def test_report_api_change_comments_on_open_issue():
@@ -58,3 +60,23 @@ def test_report_api_change_opens_issue_when_none():
     body = s.calls[1][2]["json"]
     assert body["labels"] == ["kuku-muutus"]
     assert "Kuku" in body["title"]
+
+
+def test_list_assets_skips_and_deletes_unfinished_uploads():
+    s = FakeSession([
+        ("GET", "/releases/1/assets", Resp(200, [
+            {"id": 5, "name": "77.mp3", "state": "uploaded", "label": "Osa", "created_at": "2026-09-28T09:00:00Z",
+             "browser_download_url": "https://gh/77.mp3"},
+            {"id": 6, "name": "78.mp3", "state": "starter", "label": None, "created_at": "2026-09-28T09:00:00Z",
+             "browser_download_url": "https://gh/78.mp3"}])),
+        ("DELETE", "/releases/assets/6", Resp(204))])
+    assets = GitHubClient("o/r", "t", s).list_assets({"id": 1})
+    assert list(assets) == ["77.mp3"]
+    assert assets["77.mp3"]["created_at"] == "2026-09-28T09:00:00Z"
+    assert ("DELETE", "https://api.github.com/repos/o/r/releases/assets/6") in [(m, u) for m, u, _ in s.calls]
+
+
+def test_list_show_tags():
+    s = FakeSession([("GET", "/releases", Resp(200, [
+        {"id": 1, "tag_name": "saade-209"}, {"id": 2, "tag_name": "v1.0"}]))])
+    assert [r["tag_name"] for r in GitHubClient("o/r", "t", s).list_show_releases()] == ["saade-209"]

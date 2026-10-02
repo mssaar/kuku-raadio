@@ -19,6 +19,7 @@ const ICONS = {
   fwd30: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M25.5 13A10 10 0 1 0 24 21.5"/><path d="M26 6.5V13h-6.5"/><text x="15.5" y="20" font-size="8.5" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="Figtree, sans-serif">30</text></svg>',
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
   logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/></svg>',
   mark: '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#26262a"/><circle cx="32" cy="32" r="18" fill="none" stroke="#f5b73b" stroke-width="5"/><circle cx="32" cy="32" r="6" fill="#f5b73b"/></svg>',
 };
@@ -122,11 +123,20 @@ function setChrome(visible) {
 
 function renderBanner() {
   const b = $("banner");
-  if (state.status && state.status.ok === false) {
+  const st = state.status || {};
+  b.classList.toggle("banner--quiet", st.ok !== false);
+  if (st.ok === false && st.kind === "error") {
+    b.hidden = false;
+    b.innerHTML = `<strong>Viimane uuendus ebaõnnestus. Järgmine katse on 3 tunni pärast.</strong>
+      <code>${esc(st.message)}</code>`;
+  } else if (st.ok === false) {
     b.hidden = false;
     b.innerHTML = `<strong>Kuku on midagi muutnud — salvestamine on peatunud ja kood vajab parandamist.</strong>
-      <code>${esc(state.status.message)}</code><br>
+      <code>${esc(st.message)}</code><br>
       <a href="https://github.com/${esc(state.repo)}/issues?q=is%3Aopen+label%3Akuku-muutus" target="_blank" rel="noopener">Vaata teadet GitHubis</a>`;
+  } else if (st.message && state.token) {
+    b.hidden = false;
+    b.innerHTML = esc(st.message);
   } else {
     b.hidden = true;
   }
@@ -299,15 +309,17 @@ function renderHome() {
       <button class="icon-btn" id="logout" aria-label="Logi välja" title="Logi välja">${ICONS.logout}</button>
     </header>
     ${resume ? `
-      <section class="resume" aria-label="${label}">
+      <section class="section section--first" aria-labelledby="resume-h">
+      <h2 class="section__title" id="resume-h">${label}</h2>
+      <div class="resume">
         ${coverHtml(resume.show, "cover--md")}
         <div class="resume__text">
-          <p class="resume__label">${label}</p>
           <p class="resume__title">${esc(resume.episode.title)}</p>
           <p class="resume__show">${esc(resume.show.name)} · ${fmtDate(resume.episode.published_at)}</p>
           <div class="bar" aria-hidden="true"><span style="width:${(progressFraction(store, resume.episode.id) * 100).toFixed(1)}%"></span></div>
         </div>
         <button class="play" data-play="${resume.episode.id}" aria-label="Esita ${esc(resume.episode.title)}">${ICONS.play}</button>
+      </div>
       </section>` : ""}
     <section class="section" aria-labelledby="my-shows">
       <h2 class="section__title" id="my-shows">Sinu saated</h2>
@@ -349,9 +361,9 @@ function renderShow(id) {
       <li class="ep" data-ep="${e.id}">
         <p class="ep__title">${esc(e.title)}</p>
         <p class="ep__meta">
-          <span>${fmtDate(e.published_at)}</span><span>${fmtMinutes(e.duration_seconds)}</span>
+          <span>${fmtDate(e.published_at)}</span>${e.duration_seconds ? `<span>${fmtMinutes(e.duration_seconds)}</span>` : ""}
           ${heard ? `<span class="heard">${ICONS.check} Kuulatud</span>` : ""}
-          ${left <= SOON_DAYS ? `<span class="soon">Kustub ${fmtDate(e.expires_at)}</span>` : `<span>Kustub ${fmtDate(e.expires_at)}</span>`}
+          ${left <= SOON_DAYS ? `<span class="soon">${ICONS.clock} Kustub varsti · ${fmtDate(e.expires_at)}</span>` : `<span>Kustub ${fmtDate(e.expires_at)}</span>`}
         </p>
         ${frac > 0 && !heard ? `<div class="bar" aria-hidden="true"><span style="width:${(frac * 100).toFixed(1)}%"></span></div>` : ""}
         <button class="play" data-play="${e.id}" aria-label="Esita ${esc(e.title)}">${ICONS.play}</button>
@@ -567,7 +579,7 @@ function seekBy(delta) {
   audio.currentTime = Math.max(0, Math.min((audio.duration || Infinity) - 1, audio.currentTime + delta));
 }
 
-const SPEEDS = [1, 1.25, 1.5, 0.75];
+const SPEEDS = [1, 1.25, 1.5];
 $("speed").addEventListener("click", () => {
   const next = SPEEDS[(SPEEDS.indexOf(audio.playbackRate) + 1) % SPEEDS.length] || 1;
   audio.playbackRate = next;

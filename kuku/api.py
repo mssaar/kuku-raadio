@@ -6,7 +6,7 @@ visatakse KukuApiChanged, et oleks selge, et koodi tuleb kohandada.
 
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 
@@ -51,15 +51,21 @@ def _field(obj, key, types, where):
 
 def _parse_time(value, where):
     try:
-        return datetime.fromisoformat(value)
+        parsed = datetime.fromisoformat(value)
     except ValueError:
         raise KukuApiChanged(f"{where}: ajatempel '{value}' pole loetav") from None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+def _is_transient(status):
+    return status >= 500 or status == 429
 
 
 class KukuClient:
-    def __init__(self, session=None, base=API_BASE):
+    def __init__(self, session=None, base=API_BASE, retry_delay=5):
         self.session = session or requests.Session()
         self.base = base
+        self.retry_delay = retry_delay
 
     def _get(self, path, params, where):
         url = self.base + path
@@ -69,12 +75,15 @@ class KukuClient:
             except requests.RequestException:
                 if attempt == 2:
                     raise
-                time.sleep(5)
+                time.sleep(self.retry_delay)
                 continue
-            if response.status_code >= 500 and attempt < 2:
-                time.sleep(5)
+            if _is_transient(response.status_code) and attempt < 2:
+                time.sleep(self.retry_delay)
                 continue
             break
+        if _is_transient(response.status_code):
+            # Kuku on ajutiselt maas — see pole liidese muutus
+            raise requests.HTTPError(f"{where}: Kuku vastas HTTP {response.status_code}")
         if response.status_code == 404:
             return None
         if response.status_code != 200:

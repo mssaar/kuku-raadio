@@ -87,3 +87,18 @@ def test_episode_url_missing_raises_api_changed():
     client = KukuClient(FakeSession({("/kuula/episodes/urls", 1): (200, {})}))
     with pytest.raises(KukuApiChanged, match="77"):
         client.episode_url(77)
+
+
+def test_server_error_after_retries_is_not_api_change():
+    import requests
+    session = FakeSession({("/kuula/shows", 1): (503, {})})
+    with pytest.raises(requests.HTTPError):
+        KukuClient(session, retry_delay=0).list_shows()
+    assert len(session.calls) == 3
+
+
+def test_naive_timestamp_is_treated_as_utc():
+    page = episodes_page([episode(3, "2026-09-28T08:00:00")])
+    client = KukuClient(FakeSession({("/kuula/shows/209/episodes", 1): (200, page)}))
+    eps = client.list_episodes(209, datetime(2026, 1, 1, tzinfo=timezone.utc))
+    assert eps[0].published_at == datetime(2026, 9, 28, 8, tzinfo=timezone.utc)

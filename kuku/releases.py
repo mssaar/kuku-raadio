@@ -29,6 +29,15 @@ class GitHubClient:
         resp = self._req("GET", f"/releases/tags/{tag}", ok=(200, 404))
         return None if resp.status_code == 404 else resp.json()
 
+    def list_show_releases(self):
+        releases, page = [], 1
+        while True:
+            batch = self._req("GET", "/releases", params={"per_page": 100, "page": page}).json()
+            releases += [r for r in batch if r.get("tag_name", "").startswith("saade-")]
+            if len(batch) < 100:
+                return releases
+            page += 1
+
     def get_or_create_release(self, tag, name):
         release = self.find_release(tag)
         if release:
@@ -44,7 +53,12 @@ class GitHubClient:
             batch = self._req("GET", f"/releases/{release['id']}/assets",
                               params={"per_page": 100, "page": page}).json()
             for a in batch:
-                assets[a["name"]] = {"id": a["id"], "browser_download_url": a["browser_download_url"]}
+                if a.get("state", "uploaded") != "uploaded":
+                    # katkenud üleslaadimine; kustuta, et järgmine kord uuesti proovida
+                    self.delete_asset(a["id"])
+                    continue
+                assets[a["name"]] = {"id": a["id"], "browser_download_url": a["browser_download_url"],
+                                     "label": a.get("label") or "", "created_at": a.get("created_at")}
             if len(batch) < 100:
                 return assets
             page += 1

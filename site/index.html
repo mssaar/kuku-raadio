@@ -39,9 +39,10 @@
     <header class="sheet__head">
       <button class="icon-btn" id="sheet-close" aria-label="Sulge pleier"></button>
       <span class="sheet__label">Praegu mängib</span>
-      <span class="icon-btn icon-btn--ghost" aria-hidden="true"></span>
+      <button class="speed" id="speed" aria-label="Kiirus">1×</button>
     </header>
-    <div class="sheet__art cover cover--xl" id="sheet-cover"></div>
+    <div class="sheet__stage"><div class="sheet__art cover cover--xl" id="sheet-cover"></div></div>
+    <div class="sheet__controls">
     <div class="sheet__meta">
       <h2 class="sheet__title" id="sheet-title"></h2>
       <a class="sheet__show" id="sheet-show" href="#/"></a>
@@ -51,11 +52,10 @@
       <div class="scrub__times"><span id="t-now">0:00</span><span id="t-left">0:00</span></div>
     </div>
     <div class="transport">
-      <button class="speed" id="speed" aria-label="Kiirus">1×</button>
       <button class="icon-btn icon-btn--lg" id="back" aria-label="15 sekundit tagasi"></button>
       <button class="play play--xl" id="sheet-toggle" aria-label="Esita"></button>
       <button class="icon-btn icon-btn--lg" id="fwd" aria-label="30 sekundit edasi"></button>
-      <span class="speed speed--ghost" aria-hidden="true"></span>
+    </div>
     </div>
   </section>
 
