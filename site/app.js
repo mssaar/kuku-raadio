@@ -72,9 +72,12 @@ function fmtMinutes(s) {
 
 function greeting() {
   const h = new Date().getHours();
-  if (h >= 5 && h < 11) return "Tere hommikust";
-  if (h >= 11 && h < 17) return "Tere päevast";
-  if (h >= 17 && h < 23) return "Tere õhtust";
+  if (h >= 5 && h < 8) return "Tere varahommikust";
+  if (h >= 8 && h < 10) return "Tere hommikust";
+  if (h >= 10 && h < 12) return "Tere ennelõunat";
+  if (h >= 12 && h < 14) return "Tere! On lõunasöögi aeg.";
+  if (h >= 14 && h < 18) return "Tere! On õhtuoote aeg.";
+  if (h >= 18 && h < 22) return "Tere õhtupoolikut";
   return "Head ööd";
 }
 
