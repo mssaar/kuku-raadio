@@ -1,0 +1,47 @@
+name: Automaatne Otse-salvestus
+
+on:
+  schedule:
+    # Käivitub kolmapäeviti kell 10:00 ja 11:00 UTC (Eesti aja järgi 12:00, 13:00 või 14:00 sõltuvalt suve/talveajast)
+    - cron: "55 9,10 * * 3"
+  workflow_dispatch:
+
+concurrency:
+  group: kuku-record
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          pip install pytz
+      - name: Kontrolli ja salvesta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -m kuku.auto_record
+      - name: Salvesta library.json uuendus
+        run: |
+          git config user.name "kuku-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data
+          if ! git diff --cached --quiet; then
+            git commit -m "Uus salvestus lisatud"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
