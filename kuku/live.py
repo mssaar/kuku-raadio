@@ -77,3 +77,16 @@ def remove_ads(input_path: str, output_path: str, ad_intervals: list[tuple[int, 
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+
+import pytz
+from kuku.api import Episode
+
+def get_premiere_schedules(episodes: list[Episode], show_id: int, show_name: str) -> list[Schedule]:
+    "Leiab API osade põhjal saate eetrisoleku ajad."
+    tz = pytz.timezone('Europe/Tallinn')
+    schedules = set()
+    for ep in episodes[:5]:
+        dt = ep.published_at.astimezone(tz)
+        schedules.add((dt.weekday(), dt.hour))
+    return [Schedule(show_id=show_id, name=show_name, weekday=w, hour=h, duration_minutes=60) for w, h in schedules]
+
