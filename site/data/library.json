@@ -58,6 +58,124 @@
      "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/309857.mp3"
     }
    ]
+  },
+  {
+   "id": 111513,
+   "name": "Jäljed gloobusel",
+   "episodes": [
+    {
+     "id": 310323,
+     "title": "208. saade. Kunnar Karuga sherpadest ja Kanchenjungast.",
+     "published_at": "2026-09-17T08:00:00Z",
+     "expires_at": "2027-03-18T08:00:00Z",
+     "duration_seconds": 2617.9,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/310323.mp3"
+    },
+    {
+     "id": 310320,
+     "title": "207. saade. Viiuldaja Johannaga Indoneesiast ja Vietnamist",
+     "published_at": "2026-09-10T08:00:00Z",
+     "expires_at": "2027-03-11T08:00:00Z",
+     "duration_seconds": 2742.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/310320.mp3"
+    },
+    {
+     "id": 310317,
+     "title": "206. saade. Viiuldaja Johannaga lastega reisimisest",
+     "published_at": "2026-09-03T08:00:00Z",
+     "expires_at": "2027-03-04T08:00:00Z",
+     "duration_seconds": 2614.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/310317.mp3"
+    },
+    {
+     "id": 278615,
+     "title": "205. saade. Timo Tarve ja Neeme Korvi abiga Transnistriast",
+     "published_at": "2026-06-18T08:00:00Z",
+     "expires_at": "2026-12-17T08:00:00Z",
+     "duration_seconds": 2719.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278615.mp3"
+    },
+    {
+     "id": 278612,
+     "title": "Dominikaani Vabariik vol II",
+     "published_at": "2026-06-11T08:00:00Z",
+     "expires_at": "2026-12-10T08:00:00Z",
+     "duration_seconds": 2626.5,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278612.mp3"
+    },
+    {
+     "id": 278609,
+     "title": "203. saade. Dominikaani Vabariik",
+     "published_at": "2026-06-04T08:00:00Z",
+     "expires_at": "2026-12-03T08:00:00Z",
+     "duration_seconds": 2604.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278609.mp3"
+    },
+    {
+     "id": 278606,
+     "title": "202. saade. Teekond Dominikaani Vabariiki",
+     "published_at": "2026-05-28T08:00:00Z",
+     "expires_at": "2026-11-26T08:00:00Z",
+     "duration_seconds": 2630.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278606.mp3"
+    },
+    {
+     "id": 278603,
+     "title": "201. saade. Liisi Kasuk ja Mariell Jüssi vol II",
+     "published_at": "2026-05-21T08:00:00Z",
+     "expires_at": "2026-11-19T08:00:00Z",
+     "duration_seconds": 2584.0,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278603.mp3"
+    },
+    {
+     "id": 278600,
+     "title": "200. saade. Liisi Kasuk ja Mariell Jüssi",
+     "published_at": "2026-05-14T08:00:00Z",
+     "expires_at": "2026-11-12T08:00:00Z",
+     "duration_seconds": 2663.3,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278600.mp3"
+    },
+    {
+     "id": 278597,
+     "title": "199. saade. Mihkel Mustaga Etioopiast vol II",
+     "published_at": "2026-05-07T08:00:00Z",
+     "expires_at": "2026-11-05T08:00:00Z",
+     "duration_seconds": 2676.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278597.mp3"
+    },
+    {
+     "id": 278594,
+     "title": "198. saade. Mihkel Mustaga Etioopiast",
+     "published_at": "2026-04-30T08:00:00Z",
+     "expires_at": "2026-10-29T08:00:00Z",
+     "duration_seconds": 2632.9,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278594.mp3"
+    },
+    {
+     "id": 278591,
+     "title": "197. saade. Reigo Ahvenaga New Orleansist",
+     "published_at": "2026-04-23T08:00:00Z",
+     "expires_at": "2026-10-22T08:00:00Z",
+     "duration_seconds": 2710.1,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278591.mp3"
+    },
+    {
+     "id": 278588,
+     "title": "196. saade. Reigo Ahven",
+     "published_at": "2026-04-16T08:00:00Z",
+     "expires_at": "2026-10-15T08:00:00Z",
+     "duration_seconds": 2720.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278588.mp3"
+    },
+    {
+     "id": 278585,
+     "title": "195. saade. Pääru Ojaga Laosest",
+     "published_at": "2026-04-09T08:00:00Z",
+     "expires_at": "2026-10-08T08:00:00Z",
+     "duration_seconds": 2675.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278585.mp3"
+    }
+   ]
   }
  ]
 }
