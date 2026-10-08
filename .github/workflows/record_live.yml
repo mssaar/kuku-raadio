@@ -2,8 +2,8 @@ name: Automaatne Otse-salvestus
 
 on:
   schedule:
-    # Käivitub kolmapäeviti kell 10:00 ja 11:00 UTC (Eesti aja järgi 12:00, 13:00 või 14:00 sõltuvalt suve/talveajast)
-    - cron: "55 9,10 * * 3"
+    # Käivitub iga tund kell XX:55 (nt 12:55), et olla valmis järgmiseks täistunniks
+    - cron: "55 * * * *"
   workflow_dispatch:
 
 concurrency:

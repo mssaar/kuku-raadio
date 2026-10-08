@@ -10,7 +10,8 @@ from kuku.api import KukuClient
 
 # Saate graafik (Eesti aja järgi)
 SCHEDULES = [
-    Schedule(show_id=214, name="Buum", weekday=2, hour=13, duration_minutes=60)
+    Schedule(show_id=214, name="Buum", weekday=2, hour=13, duration_minutes=60),
+    Schedule(show_id=111513, name="Jäljed gloobusel", weekday=3, hour=11, duration_minutes=60)
 ]
 
 def is_previous_episode_premium(show_id: int) -> bool:
