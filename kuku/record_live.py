@@ -13,7 +13,7 @@ from kuku.releases import GitHubClient
 from kuku.sync import DATA_DIR, tag_for, _entry, _read, _write
 from kuku.api import Episode
 
-STREAM_URL = "http://naba-live.babahhcdn.com/kuku/kuku.stream/playlist.m3u8"
+STREAM_URL = "https://router.euddn.net/8103046e16b71d15d692b57c187875c7/kuku.mp3"
 
 def record_stream(url: str, output_path: str, duration_seconds: int):
     """Salvestab striimi ffmpeg abil."""
