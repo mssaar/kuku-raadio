@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-09T18:21:12Z",
+ "updated_at": "2026-10-10T00:50:43Z",
  "shows": [
   {
    "id": 4714,
@@ -510,6 +510,12 @@
    "name": "PowerStage",
    "description": "Powerstage on garaaž ralliteemadele, mida ohjavad Rauno Paltser ja Gustav Kruuda! Kaasa räägivad oma ala tipud ja spetsialistid!",
    "image": "https://f302.pmo.ee/VGY9JrEjSPAsoPZRp_KR-Tzy6O0=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/kEX1fbSt3qsaXHues3fotgDScXZppP3TuuHzlc4w.png"
+  },
+  {
+   "id": 111782,
+   "name": "Presidendivahetus",
+   "description": "Erisaade Ülle Madise ametissevannutamise tseremoonist.",
+   "image": "https://f302.pmo.ee/G4rluZG1hKvoZ0v7OzPSlWvsqlk=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/5fc2Mr28Fgvx3kPtNHVzIj64Fmje2nXGAwgBi43h.png"
   },
   {
    "id": 111609,
