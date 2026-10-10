@@ -60,11 +60,6 @@
    ]
   },
   {
-   "id": 241,
-   "name": "Jukuraadio",
-   "episodes": []
-  },
-  {
    "id": 111513,
    "name": "Jäljed gloobusel",
    "episodes": [
@@ -173,11 +168,6 @@
      "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278588.mp3"
     }
    ]
-  },
-  {
-   "id": 175,
-   "name": "Keskpäevatund",
-   "episodes": []
   }
  ]
 }
