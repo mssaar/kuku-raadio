@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-12T10:48:49Z",
+ "updated_at": "2026-10-12T21:16:11Z",
  "shows": [
   {
    "id": 4714,
@@ -512,12 +512,6 @@
    "image": "https://f302.pmo.ee/VGY9JrEjSPAsoPZRp_KR-Tzy6O0=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/kEX1fbSt3qsaXHues3fotgDScXZppP3TuuHzlc4w.png"
   },
   {
-   "id": 111782,
-   "name": "Presidendivahetus",
-   "description": "Erisaade Ülle Madise ametissevannutamise tseremoonist.",
-   "image": "https://f302.pmo.ee/G4rluZG1hKvoZ0v7OzPSlWvsqlk=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/5fc2Mr28Fgvx3kPtNHVzIj64Fmje2nXGAwgBi43h.png"
-  },
-  {
    "id": 111609,
    "name": "Pressisektor",
    "description": "«Pressisektor» on Postimehe spordisaade. Särtsakas ja otsekohene! Selle kuulamine on rangelt soovitatav!",
@@ -564,6 +558,12 @@
    "name": "Roostevaba Terras",
    "description": "Vestlused Euroopa Parlamendi saadiku Riho Terrasega. Saadet juhib Mart Mardisalu.",
    "image": "https://f302.pmo.ee/u-TV_KrhYDuqpxefKtpbDo75ITY=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/KxXCc4nX6BeYqSVzS9Rhk7V1B0dYqUmRbWougMJr.png"
+  },
+  {
+   "id": 286,
+   "name": "Sakala stuudio",
+   "description": "Kui sulle saunas kuuldust ei piisa! Viljandi uudiste podcast.",
+   "image": "https://f302.pmo.ee/DWVeUg9PUceMrIx95hKTXNCopt8=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/vQf4Dj87HfN9JbEhm876W0EHLCvfqH1fu8b9Ft8j.jpg"
   },
   {
    "id": 286,
