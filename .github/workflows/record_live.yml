@@ -2,9 +2,21 @@ name: Automaatne Otse-salvestus
 
 on:
   schedule:
-    # Käivitub iga tund kell XX:55 (nt 12:55), et olla valmis järgmiseks täistunniks
-    - cron: "55 * * * *"
+    # Käivitub iga tund kell XX:52, et olla valmis järgmiseks täistunniks
+    - cron: "52 * * * *"
   workflow_dispatch:
+    inputs:
+      test_minutes:
+        description: "Testsalvestuse pikkus minutites (nt 10). Tühjaks jättes tavarežiim."
+        required: false
+        default: ""
+      test_start_time:
+        description: "Testsalvestuse alguskellaaeg Tallinna aja järgi HH:MM (valikuline)"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths: [".github/workflows/record_live.yml"]
 
 concurrency:
   group: kuku-record
@@ -13,11 +25,15 @@ concurrency:
 permissions:
   contents: write
   issues: write
+  pages: write
+  id-token: write
 
 jobs:
   record:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    outputs:
+      changed: ${{ steps.save.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,9 +49,12 @@ jobs:
       - name: Kontrolli ja salvesta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TEST_RECORD_MINUTES: ${{ github.event_name == 'push' && '10' || inputs.test_minutes }}
+          TEST_START_TIME: ${{ inputs.test_start_time }}
         run: |
           python -m kuku.auto_record
       - name: Salvesta library.json uuendus
+        id: save
         run: |
           git config user.name "kuku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -44,4 +63,24 @@ jobs:
             git commit -m "Uus salvestus lisatud"
             git pull --rebase origin main
             git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.save.outputs.changed == 'true'
+        with:
+          path: site
+
+  deploy:
+    needs: record
+    if: needs.record.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+

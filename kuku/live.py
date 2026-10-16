@@ -1,7 +1,7 @@
 """Otse-eetri salvestamise abifunktsioonid."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @dataclass
 class Schedule:
@@ -28,9 +28,18 @@ def get_ad_intervals(ad_times_str: str) -> list[tuple[int, int]]:
 
 
 def should_record_now(schedule: Schedule, now: datetime) -> bool:
-    """Kontrollib, kas antud saate peaks praegu salvestama."""
-    logical_hour = now.hour if now.minute < 30 else (now.hour + 1) % 24
-    return now.weekday() == schedule.weekday and logical_hour == schedule.hour
+    """Kontrollib, kas antud saate peaks praegu (või kohe saabuval täistunnil) salvestama."""
+    target = (now + timedelta(minutes=30)) if now.minute >= 30 else now
+    return target.weekday() == schedule.weekday and target.hour == schedule.hour
+
+
+def compute_recording_plan(schedule: Schedule, now: datetime) -> tuple[int, int]:
+    """Tagastab (ootamise_sekundid, salvestuse_kestus_minutites)."""
+    if now.minute >= 30:
+        wait_seconds = (60 - now.minute) * 60 - now.second
+        return wait_seconds, schedule.duration_minutes
+    remaining_minutes = max(1, schedule.duration_minutes - now.minute)
+    return 0, remaining_minutes
 
 import subprocess
 import os
