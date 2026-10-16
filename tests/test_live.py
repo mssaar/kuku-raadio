@@ -5,13 +5,18 @@ import pytz
 from kuku.live import get_ad_intervals, should_record_now, compute_recording_plan, Schedule
 
 def test_get_ad_intervals_auto():
-    # 'auto' should return typical Kuku ad blocks in seconds: 0-5 mins and 30-35 mins
+    # 'auto' should return refined Kuku ad blocks for live recordings in seconds:
+    # 0-6:55 (news+ads), 16:10-18:20 (ads), 29:10-34:10 (mid-hour news+ads), 45:50-47:50 (ads)
     intervals = get_ad_intervals("auto")
-    assert intervals == [(0, 300), (1800, 2100)]
+    assert intervals == [(0, 415), (970, 1100), (1750, 2050), (2750, 2870)]
 
 def test_get_ad_intervals_custom():
     intervals = get_ad_intervals("10-15,45-50")
     assert intervals == [(600, 900), (2700, 3000)]
+
+def test_get_ad_intervals_mmss():
+    intervals = get_ad_intervals("0-1:55, 11:10-13:20, 24:10-25:00, 35:50-37:50")
+    assert intervals == [(0, 115), (670, 800), (1450, 1500), (2150, 2270)]
 
 def test_get_ad_intervals_empty():
     assert get_ad_intervals("") == []

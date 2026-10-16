@@ -101,13 +101,14 @@ def main():
         
         asset = github.upload_asset(release, str(clean_mp3), f"{episode_id}.mp3", args.episode_title)
         
+        actual_duration = int(round(clean_mp3.stat().st_size / 16000))
         ep = Episode(
             id=episode_id,
             title=args.episode_title,
             published_at=now,
             is_premium=False,
             is_playable=True,
-            duration_seconds=args.duration * 60,
+            duration_seconds=actual_duration,
         )
         
         entry = _entry(ep, asset)

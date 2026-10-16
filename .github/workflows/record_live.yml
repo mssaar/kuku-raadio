@@ -14,6 +14,18 @@ on:
         description: "Testsalvestuse alguskellaaeg Tallinna aja järgi HH:MM (valikuline)"
         required: false
         default: ""
+      recut_show_id:
+        description: "Uuesti lõigatava saate ID (nt 514)"
+        required: false
+        default: ""
+      recut_episode_id:
+        description: "Uuesti lõigatava osa ID (nt 1792141202)"
+        required: false
+        default: ""
+      recut_ad_times:
+        description: "Reklaamide vahemikud uuesti lõikamiseks"
+        required: false
+        default: "0-1:55, 11:10-13:20, 24:10-25:00, 35:50-37:50"
 
 concurrency:
   group: kuku-record
@@ -47,7 +59,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -m kuku.auto_record
+          if [ -n "${{ inputs.recut_episode_id }}" ]; then
+            python -m kuku.recut --show-id "${{ inputs.recut_show_id }}" --episode-id "${{ inputs.recut_episode_id }}" --ad-times "${{ inputs.recut_ad_times }}"
+          else
+            python -m kuku.auto_record
+          fi
       - name: Salvesta library.json uuendus
         id: save
         run: |

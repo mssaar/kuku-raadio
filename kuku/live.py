@@ -12,19 +12,37 @@ class Schedule:
     duration_minutes: int
 
 
+def parse_time_seconds(time_str: str) -> int:
+    """Teisendab aja stringi (nt '11:10', '1:55', '5') sekunditeks."""
+    time_str = time_str.strip()
+    if ":" in time_str:
+        parts = time_str.split(":")
+        if len(parts) == 2:
+            return int(parts[0]) * 60 + int(parts[1])
+        elif len(parts) == 3:
+            return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+    return int(time_str) * 60
+
+
 def get_ad_intervals(ad_times_str: str) -> list[tuple[int, int]]:
     """Tagastab reklaamide vahemikud sekundites."""
     if not ad_times_str:
         return []
         
     if ad_times_str.lower() == "auto":
-        return [(0, 5 * 60), (30 * 60, 35 * 60)]
+        # Kuku raadio standardsed otse-eetri uudiste ja reklaamide plokid:
+        # 1. 0:00 - 6:55 (alguse uudised ja reklaamid)
+        # 2. 16:10 - 18:20 (veerandtunni reklaamipaus)
+        # 3. 29:10 - 34:10 (pooltunni uudised ja reklaam; 34:10 hoiab ära saateosa alguse kärpimise)
+        # 4. 45:50 - 47:50 (kolmveerandtunni reklaamipaus)
+        return [(0, 415), (970, 1100), (1750, 2050), (2750, 2870)]
         
     intervals = []
     for part in ad_times_str.split(","):
         s, e = part.split("-")
-        intervals.append((int(s) * 60, int(e) * 60))
+        intervals.append((parse_time_seconds(s), parse_time_seconds(e)))
     return intervals
+
 
 
 def should_record_now(schedule: Schedule, now: datetime) -> bool:
