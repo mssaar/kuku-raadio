@@ -42,34 +42,58 @@ def main(now_override: datetime | None = None):
     with open(shows_file, "r", encoding="utf-8") as f:
         my_shows = json.load(f)
 
-    test_minutes_str = os.environ.get("TEST_RECORD_MINUTES", "").strip()
-    if test_minutes_str:
-        test_minutes = int(test_minutes_str)
-        start_time_str = os.environ.get("TEST_START_TIME", "").strip()
-        wait_sec = _wait_seconds_for_time_str(now, start_time_str)
-        if wait_sec > 0:
-            print(f"Testrežiim: ootan {wait_sec} sekundit kuni kellaajani {start_time_str}...")
-            time.sleep(wait_sec)
-            now = now + timedelta(seconds=wait_sec)
+    # Kustutame vana 10-min Digitunni test-asseti, kui see on GitHubis alles
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    token = os.environ.get("GITHUB_TOKEN")
+    if repo and token:
+        try:
+            from kuku.releases import GitHubClient
+            gh = GitHubClient(repo, token)
+            rel = gh.find_release("saade-209")
+            if rel:
+                assets = gh.list_assets(rel)
+                if "1792131850.mp3" in assets:
+                    gh.delete_asset(assets["1792131850.mp3"]["id"])
+                    print("Kustutasin vana 10-min Digitunni testfaili GitHubist.")
+        except Exception as e:
+            print(f"Hoiatus vana testfaili kustutamisel: {e}")
 
-        first_show = my_shows[0] if my_shows else {"id": 209, "name": "Digitund"}
-        title = f"{first_show['name']} (Test {now.strftime('%d.%m.%Y %H:%M')})"
-        print(f"Käivitan {test_minutes}-minutilise testsalvestuse: {title}")
-        cmd = [
-            sys.executable, "-m", "kuku.record_live",
-            "--show-id", str(first_show["id"]),
-            "--show-name", first_show["name"],
-            "--episode-title", title,
-            "--duration", str(test_minutes),
-            "--ad-times", ""
-        ]
-        subprocess.run(cmd, check=True)
-        return
+    library_file = DATA_DIR / "library.json"
+    library = {"shows": []}
+    if library_file.exists():
+        with open(library_file, "r", encoding="utf-8") as f:
+            library = json.load(f)
+
+    # Kui shows.json sisaldab reaalaja-testi kirjet (live_only), millel pole veel salvestust,
+    # salvestame kohe praegusel ajahetkel 5 minutit Kuku Raadio otse-eetrit.
+    for show in my_shows:
+        if show.get("live_only"):
+            existing_eps = next(
+                (s.get("episodes", []) for s in library.get("shows", []) if s["id"] == show["id"]),
+                [],
+            )
+            if not existing_eps:
+                duration_min = int(show.get("duration_minutes", 5))
+                end_dt = now + timedelta(minutes=duration_min)
+                title = f"Kuku otse-eeter reaalajas ({now.strftime('%d.%m.%Y %H:%M')}–{end_dt.strftime('%H:%M')})"
+                print(f"Käivitan {duration_min}-minutilise reaalaja otse-eetri salvestuse: {title}")
+                cmd = [
+                    sys.executable, "-m", "kuku.record_live",
+                    "--show-id", str(show["id"]),
+                    "--show-name", show["name"],
+                    "--episode-title", title,
+                    "--duration", str(duration_min),
+                    "--ad-times", ""
+                ]
+                subprocess.run(cmd, check=True)
+                return
 
     client = KukuClient()
     since = datetime.now(timezone.utc) - timedelta(days=60)
 
     for show in my_shows:
+        if show.get("live_only"):
+            continue
         show_id = show["id"]
         show_name = show["name"]
         try:

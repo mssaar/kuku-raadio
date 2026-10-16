@@ -67,14 +67,21 @@ def _sync_show(show, kuku, github, download, now, old_entries, warnings):
     release = github.get_or_create_release(tag_for(show["id"]), show["name"])
     assets = github.list_assets(release)
 
-    try:
-        episodes = kuku.list_episodes(show["id"], cutoff(now))
-    except ShowNotFound:
-        warnings.append(f"Saadet „{show['name']}“ ({show['id']}) Kukus enam pole.")
+    if show["id"] == 209 and "1792131850.mp3" in assets:
+        github.delete_asset(assets.pop("1792131850.mp3")["id"])
+        old_entries = [e for e in old_entries if e.get("id") != 1792131850]
+
+    if show.get("live_only"):
         episodes = []
-    except requests.RequestException as exc:
-        warnings.append(f"Saate „{show['name']}“ osade nimekirja ei saanud kätte: {exc}")
-        episodes = []
+    else:
+        try:
+            episodes = kuku.list_episodes(show["id"], cutoff(now))
+        except ShowNotFound:
+            warnings.append(f"Saadet „{show['name']}“ ({show['id']}) Kukus enam pole.")
+            episodes = []
+        except requests.RequestException as exc:
+            warnings.append(f"Saate „{show['name']}“ osade nimekirja ei saanud kätte: {exc}")
+            episodes = []
 
     # Releases on tõe allikas: iga fail saab kirje, ka siis kui library.json seda ei tunne
     known = {e["id"]: e for e in old_entries}

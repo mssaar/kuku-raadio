@@ -5,3 +5,5 @@ __pycache__/
 .impeccable/review/
 .impeccable/build/
 .impeccable/questions/
+.env
+

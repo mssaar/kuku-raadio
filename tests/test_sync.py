@@ -272,3 +272,20 @@ def test_http_download_rejects_truncated_body(tmp_path, monkeypatch):
     monkeypatch.setattr(sync_mod.requests, "get", lambda *a, **k: Resp())
     with pytest.raises(OSError, match="poolik"):
         sync_mod.http_download("https://cdn/1.mp3", tmp_path / "1.mp3")
+
+
+def test_sync_skips_kuku_api_for_live_only_show(data):
+    (data / "shows.json").write_text(json.dumps([
+        {"id": 999999, "name": "Kuku Raadio otse-eeter (Test)", "live_only": True}
+    ]))
+    gh = FakeGitHub()
+    rel = gh.get_or_create_release("saade-999999", "Kuku Raadio otse-eeter (Test)")
+    gh.upload_asset(rel, None, "100.mp3", "Otse-eetri test (5 min)")
+    kuku = FakeKuku({999999: ShowNotFound})
+    warnings = sync(data, kuku, gh, good_download, NOW)
+    assert warnings == []
+    lib = read(data, "library.json")
+    assert len(lib["shows"]) == 1
+    assert lib["shows"][0]["id"] == 999999
+    assert len(lib["shows"][0]["episodes"]) == 1
+

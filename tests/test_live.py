@@ -141,31 +141,33 @@ def test_auto_record_waits_until_hour_before_recording(monkeypatch, tmp_path):
     assert cmds[0][cmds[0].index("--duration") + 1] == "60"
 
 
-def test_auto_record_10min_test_mode(monkeypatch, tmp_path):
+def test_auto_record_5min_live_only_test_show(monkeypatch, tmp_path):
     import json
     import subprocess
     import kuku.auto_record as auto_record
 
     shows_file = tmp_path / "shows.json"
-    shows_file.write_text(json.dumps([{"id": 209, "name": "Digitund"}]), encoding="utf-8")
+    shows_file.write_text(json.dumps([
+        {"id": 209, "name": "Digitund"},
+        {"id": 999999, "name": "Kuku Raadio otse-eeter (Test)", "live_only": True},
+    ]), encoding="utf-8")
+    library_file = tmp_path / "library.json"
+    library_file.write_text(json.dumps({"shows": []}), encoding="utf-8")
     monkeypatch.setattr(auto_record, "DATA_DIR", tmp_path)
-    monkeypatch.setenv("TEST_RECORD_MINUTES", "10")
-    monkeypatch.setenv("TEST_START_TIME", "09:30")
 
     tz = pytz.timezone("Europe/Tallinn")
-    fake_now = tz.localize(datetime(2026, 10, 16, 9, 28, 40))  # 80s before 09:30
-
-    slept = []
-    monkeypatch.setattr(auto_record.time, "sleep", lambda s: slept.append(s))
+    fake_now = tz.localize(datetime(2026, 10, 16, 10, 35, 0))
 
     cmds = []
     monkeypatch.setattr(subprocess, "run", lambda cmd, **kw: cmds.append(cmd))
 
     auto_record.main(now_override=fake_now)
 
-    assert slept == [80]
     assert len(cmds) == 1
-    assert "--duration" in cmds[0]
-    assert cmds[0][cmds[0].index("--duration") + 1] == "10"
+    assert cmds[0][cmds[0].index("--show-id") + 1] == "999999"
+    assert cmds[0][cmds[0].index("--show-name") + 1] == "Kuku Raadio otse-eeter (Test)"
+    assert cmds[0][cmds[0].index("--duration") + 1] == "5"
+    assert "Digitund" not in cmds[0][cmds[0].index("--episode-title") + 1]
+
 
 

@@ -49,8 +49,6 @@ jobs:
       - name: Kontrolli ja salvesta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TEST_RECORD_MINUTES: ${{ github.event_name == 'push' && '10' || inputs.test_minutes }}
-          TEST_START_TIME: ${{ inputs.test_start_time }}
         run: |
           python -m kuku.auto_record
       - name: Salvesta library.json uuendus

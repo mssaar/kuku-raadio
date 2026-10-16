@@ -10,5 +10,12 @@
  {
   "id": 111513,
   "name": "Jäljed gloobusel"
+ },
+ {
+  "id": 999999,
+  "name": "Kuku Raadio otse-eeter (Test)",
+  "live_only": true,
+  "duration_minutes": 5
  }
 ]
+
