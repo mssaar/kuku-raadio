@@ -168,6 +168,11 @@
      "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278591.mp3"
     }
    ]
+  },
+  {
+   "id": 999999,
+   "name": "Kuku Raadio otse-eeter (Test)",
+   "episodes": []
   }
  ]
 }
