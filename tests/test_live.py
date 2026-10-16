@@ -170,4 +170,31 @@ def test_auto_record_5min_live_only_test_show(monkeypatch, tmp_path):
     assert "Digitund" not in cmds[0][cmds[0].index("--episode-title") + 1]
 
 
+def test_record_live_pulls_before_updating_library(monkeypatch, tmp_path):
+    import subprocess
+    from kuku.record_live import update_library_with_episode
+
+    lib_path = tmp_path / "library.json"
+    lib_path.write_text('{"shows": []}', encoding="utf-8")
+
+    events = []
+
+    def fake_run(cmd, **kw):
+        events.append(("git", cmd))
+        # Simulate git pull updating library.json on disk before Python reads it
+        lib_path.write_text('{"shows": [{"id": 999999, "name": "Test", "episodes": []}]}', encoding="utf-8")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    entry = {"id": 123, "title": "Osa 123"}
+    update_library_with_episode(lib_path, 999999, "Test", entry)
+
+    assert len(events) == 1
+    assert events[0][1][:3] == ["git", "pull", "--rebase"]
+    import json
+    saved = json.loads(lib_path.read_text(encoding="utf-8"))
+    assert len(saved["shows"]) == 1
+    assert saved["shows"][0]["episodes"] == [entry]
+
+
+
 

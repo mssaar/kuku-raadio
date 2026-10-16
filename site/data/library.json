@@ -172,7 +172,17 @@
   {
    "id": 999999,
    "name": "Kuku Raadio otse-eeter (Test)",
-   "episodes": []
+   "episodes": [
+    {
+     "id": 1792136412,
+     "title": "Kuku otse-eeter reaalajas (16.10.2026 10:40–10:45)",
+     "published_at": "2026-10-16T07:40:12Z",
+     "expires_at": "2027-04-16T07:40:12Z",
+     "duration_seconds": 300,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-999999/1792136412.mp3"
+    }
+   ]
   }
  ]
 }
+

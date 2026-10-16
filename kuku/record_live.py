@@ -26,6 +26,28 @@ def record_stream(url: str, output_path: str, duration_seconds: int):
         str(output_path)
     ], check=True)
 
+def update_library_with_episode(library_path: Path, show_id: int, show_name: str, entry: dict):
+    """Tõmbab värskeima git seisu enne library.json lugemist ja kirjutamist, et vältida konflikte."""
+    subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=False)
+    library = _read(library_path, {"shows": []})
+
+    show_found = False
+    for s in library.get("shows", []):
+        if s["id"] == show_id:
+            s["episodes"].insert(0, entry)
+            show_found = True
+            break
+
+    if not show_found:
+        library["shows"].append({
+            "id": show_id,
+            "name": show_name,
+            "episodes": [entry]
+        })
+
+    _write(library_path, library)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Kuku otse-eetri salvestaja")
     parser.add_argument("--show-id", type=int, required=True, help="Saate ID")
@@ -90,23 +112,8 @@ def main():
         
         entry = _entry(ep, asset)
         library_path = DATA_DIR / "library.json"
-        library = _read(library_path, {"shows": []})
-        
-        show_found = False
-        for s in library.get("shows", []):
-            if s["id"] == args.show_id:
-                s["episodes"].insert(0, entry)
-                show_found = True
-                break
-                
-        if not show_found:
-            library["shows"].append({
-                "id": args.show_id,
-                "name": args.show_name,
-                "episodes": [entry]
-            })
-            
-        _write(library_path, library)
+        update_library_with_episode(library_path, args.show_id, args.show_name, entry)
 
 if __name__ == "__main__":
     sys.exit(main())
+
