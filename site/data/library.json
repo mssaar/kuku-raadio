@@ -172,7 +172,16 @@
   {
    "id": 514,
    "name": "Kahe vahel",
-   "episodes": []
+   "episodes": [
+    {
+     "id": 1792141202,
+     "title": "Kahe vahel (16.10.2026)",
+     "published_at": "2026-10-16T09:00:02Z",
+     "expires_at": "2027-04-16T09:00:02Z",
+     "duration_seconds": 3600,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-514/1792141202.mp3"
+    }
+   ]
   }
  ]
 }
