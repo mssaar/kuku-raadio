@@ -168,6 +168,164 @@
      "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/278591.mp3"
     }
    ]
+  },
+  {
+   "id": 231,
+   "name": "Tarkade klubi",
+   "episodes": [
+    {
+     "id": 311553,
+     "title": "Tarkade klubi 12-09-2026",
+     "published_at": "2026-09-12T10:00:00Z",
+     "expires_at": "2027-03-13T10:00:00Z",
+     "duration_seconds": 2878.7,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311553.mp3"
+    },
+    {
+     "id": 311550,
+     "title": "Tarkade klubi 05-09-2026",
+     "published_at": "2026-09-05T10:00:00Z",
+     "expires_at": "2027-03-06T10:00:00Z",
+     "duration_seconds": 2582.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311550.mp3"
+    },
+    {
+     "id": 311547,
+     "title": "Inga Toom ja Tiit Naarits ning Indrek Birkan ja Enn Kirsman",
+     "published_at": "2026-08-29T10:00:00Z",
+     "expires_at": "2027-02-27T10:00:00Z",
+     "duration_seconds": 2678.3,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311547.mp3"
+    },
+    {
+     "id": 311544,
+     "title": "Tarkade klubi 22-08-2026",
+     "published_at": "2026-08-22T10:00:00Z",
+     "expires_at": "2027-02-20T10:00:00Z",
+     "duration_seconds": 2760.2,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311544.mp3"
+    },
+    {
+     "id": 313597,
+     "title": "Tarkade klubi 20-08-2026",
+     "published_at": "2026-08-20T10:00:00Z",
+     "expires_at": "2027-02-18T10:00:00Z",
+     "duration_seconds": 2681.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/313597.mp3"
+    },
+    {
+     "id": 311541,
+     "title": "Tarkade klubi 15-08-2026",
+     "published_at": "2026-08-15T10:00:00Z",
+     "expires_at": "2027-02-13T10:00:00Z",
+     "duration_seconds": 2497.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311541.mp3"
+    },
+    {
+     "id": 311529,
+     "title": "Tarkade klubi 18-07-2026",
+     "published_at": "2026-07-18T10:00:00Z",
+     "expires_at": "2027-01-16T10:00:00Z",
+     "duration_seconds": 2753.7,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311529.mp3"
+    },
+    {
+     "id": 311526,
+     "title": "Tarkade klubi 11-07-2026",
+     "published_at": "2026-07-11T10:00:00Z",
+     "expires_at": "2027-01-09T10:00:00Z",
+     "duration_seconds": 2728.7,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/311526.mp3"
+    },
+    {
+     "id": 279297,
+     "title": "Tarkade klubi 04-07-2026",
+     "published_at": "2026-07-04T10:00:00Z",
+     "expires_at": "2027-01-02T10:00:00Z",
+     "duration_seconds": 2686.5,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279297.mp3"
+    },
+    {
+     "id": 279294,
+     "title": "Tarkade klubi 27-06-2026",
+     "published_at": "2026-06-27T10:00:00Z",
+     "expires_at": "2026-12-26T10:00:00Z",
+     "duration_seconds": 2728.9,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279294.mp3"
+    },
+    {
+     "id": 279291,
+     "title": "Tarkade klubi 20-06-2026",
+     "published_at": "2026-06-20T10:00:00Z",
+     "expires_at": "2026-12-19T10:00:00Z",
+     "duration_seconds": 2788.1,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279291.mp3"
+    },
+    {
+     "id": 279288,
+     "title": "Tarkade klubi 13-06-2026",
+     "published_at": "2026-06-13T10:00:00Z",
+     "expires_at": "2026-12-12T10:00:00Z",
+     "duration_seconds": 2741.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279288.mp3"
+    },
+    {
+     "id": 279285,
+     "title": "Tarkade klubi 06-06-2026",
+     "published_at": "2026-06-06T10:00:00Z",
+     "expires_at": "2026-12-05T10:00:00Z",
+     "duration_seconds": 2086.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279285.mp3"
+    },
+    {
+     "id": 279282,
+     "title": "Tarkade klubi 30-05-2026",
+     "published_at": "2026-05-30T10:00:00Z",
+     "expires_at": "2026-11-28T10:00:00Z",
+     "duration_seconds": 2350.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279282.mp3"
+    },
+    {
+     "id": 279279,
+     "title": "Tarkade klubi 23-05-2026",
+     "published_at": "2026-05-23T10:00:00Z",
+     "expires_at": "2026-11-21T10:00:00Z",
+     "duration_seconds": 2691.4,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279279.mp3"
+    },
+    {
+     "id": 279276,
+     "title": "Tarkade klubi 16-05-2026",
+     "published_at": "2026-05-16T10:00:00Z",
+     "expires_at": "2026-11-14T10:00:00Z",
+     "duration_seconds": 2874.2,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279276.mp3"
+    },
+    {
+     "id": 279273,
+     "title": "Tarkade klubi 09-05-2026",
+     "published_at": "2026-05-09T10:00:00Z",
+     "expires_at": "2026-11-07T10:00:00Z",
+     "duration_seconds": 2428.9,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279273.mp3"
+    },
+    {
+     "id": 279270,
+     "title": "Tarkade klubi 02-05-2026",
+     "published_at": "2026-05-02T10:00:00Z",
+     "expires_at": "2026-10-31T10:00:00Z",
+     "duration_seconds": 2670.1,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279270.mp3"
+    },
+    {
+     "id": 279267,
+     "title": "Tarkade klubi 25-04-2026",
+     "published_at": "2026-04-25T10:00:00Z",
+     "expires_at": "2026-10-24T10:00:00Z",
+     "duration_seconds": 2798.6,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/279267.mp3"
+    }
+   ]
   }
  ]
 }
