@@ -15,6 +15,8 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
 - `kuku/releases.py` — GitHub Releases ja Issues API klient
 - `kuku/sync.py` — Taustatöö järelkuulamise sünkroniseerimiseks (`python -m kuku.sync`)
 - `kuku/live.py` — Otse-eetri saatekava tuvastamine (`get_premiere_schedules`, `should_record_now`) ja reklaamide eemaldamine (`remove_ads`)
+- `kuku/jingles.py` — Akustiline reklaamikõllide tuvastaja (`detect_ad_intervals`) ja FFT korrelatsioon
+- `kuku/assets/` — Kuku ametlikud reklaamikõllide helinäidised (`puhas_alguskoll.wav`, `puhas_lopukoll_*.wav`)
 - `kuku/record_live.py` — Otse-eetri striimi (`STREAM_URL`) salvestamise ja GitHub Releases'isse üleslaadimise CLI tööriist
 - `kuku/auto_record.py` — Automaatne otse-eetri kontrollija ja salvestaja (`python -m kuku.auto_record`)
 - `site/` — Veebirakenduse esikülg (`index.html`, `app.js`, `style.css`, `lib/`)
