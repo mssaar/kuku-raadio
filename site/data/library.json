@@ -97,6 +97,14 @@
    "name": "Jäljed gloobusel",
    "episodes": [
     {
+     "id": 1792656002,
+     "title": "Jäljed gloobusel (22.10.2026)",
+     "published_at": "2026-10-22T08:00:02Z",
+     "expires_at": "2027-04-22T08:00:02Z",
+     "duration_seconds": 2635,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/1792656002.mp3"
+    },
+    {
      "id": 310323,
      "title": "208. saade. Kunnar Karuga sherpadest ja Kanchenjungast.",
      "published_at": "2026-09-17T08:00:00Z",
