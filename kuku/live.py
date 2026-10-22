@@ -1,7 +1,23 @@
 """Otse-eetri salvestamise abifunktsioonid."""
 
+import os
+import subprocess
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from pathlib import Path
+import pytz
+
+from kuku.api import Episode
+
+# Vaikimisi varuintervallid, kui helifaili pole antud või automaattuvastus ei käivitu:
+# 1. 0:00 - 6:58 (alguse uudised ja reklaamid: 0 - 418 s)
+# 2. 20:28 - 21:42 (1. reklaamipaus: 1228 - 1302 s)
+# 3. 33:10 - 34:49 (2. reklaamipaus: 1990 - 2089 s)
+# 4. 45:44 - 47:54 (3. reklaamipaus: 2744 - 2874 s)
+# 5. 57:38 - 60:00 (lõpukõll ja järgmise tunni algus: 3458 - 3600 s)
+DEFAULT_AUTO_INTERVALS = [(0, 418), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
+
 
 @dataclass
 class Schedule:
@@ -24,25 +40,31 @@ def parse_time_seconds(time_str: str) -> int:
     return int(time_str) * 60
 
 
-def get_ad_intervals(ad_times_str: str) -> list[tuple[int, int]]:
-    """Tagastab reklaamide vahemikud sekundites."""
+def get_ad_intervals(ad_times_str: str, audio_path: str | Path = None) -> list[tuple[int, int]]:
+    """Tagastab reklaamide vahemikud sekundites.
+    
+    Kui ad_times_str on 'auto' ja audio_path on antud, tuvastatakse intervallid
+    akustiliselt reklaamikõllide järgi.
+    """
     if not ad_times_str:
         return []
-        
+
     if ad_times_str.lower() == "auto":
-        # Kuku raadio standardsed otse-eetri uudiste ja reklaamide plokid:
-        # 1. 0:00 - 6:55 (alguse uudised ja reklaamid)
-        # 2. 16:10 - 18:20 (veerandtunni reklaamipaus)
-        # 3. 29:10 - 34:10 (pooltunni uudised ja reklaam; 34:10 hoiab ära saateosa alguse kärpimise)
-        # 4. 45:50 - 47:50 (kolmveerandtunni reklaamipaus)
-        return [(0, 415), (970, 1100), (1750, 2050), (2750, 2870)]
-        
+        if audio_path and os.path.exists(audio_path):
+            try:
+                from kuku.jingles import detect_ad_intervals
+                detected = detect_ad_intervals(audio_path)
+                if detected:
+                    return detected
+            except Exception as e:
+                print(f"Hoiatus: Akustiline kõllituvastus ebaõnnestus: {e}, kasutan vaikeaegu.")
+        return list(DEFAULT_AUTO_INTERVALS)
+
     intervals = []
     for part in ad_times_str.split(","):
         s, e = part.split("-")
         intervals.append((parse_time_seconds(s), parse_time_seconds(e)))
     return intervals
-
 
 
 def should_record_now(schedule: Schedule, now: datetime) -> bool:
@@ -59,27 +81,22 @@ def compute_recording_plan(schedule: Schedule, now: datetime) -> tuple[int, int]
     remaining_minutes = max(1, schedule.duration_minutes - now.minute)
     return 0, remaining_minutes
 
-import subprocess
-import os
-import tempfile
-from pathlib import Path
 
 def remove_ads(input_path: str, output_path: str, ad_intervals: list[tuple[int, int]]):
-    # This expects total_duration to be known, but if we don't have it, we can just use a very large number for the end
-    # For simplicity, let's keep track of segments to keep
-    # e.g., if ads are (0, 300), (1800, 2100), then keep is (300, 1800) and (2100, 999999)
+    from kuku.jingles import get_ffmpeg
+    ffmpeg = get_ffmpeg()
+
     keep_segments = []
     current_pos = 0
     for start, end in sorted(ad_intervals):
         if start > current_pos:
             keep_segments.append((current_pos, start))
         current_pos = max(current_pos, end)
-    
+
     keep_segments.append((current_pos, 999999))
-    
+
     if len(keep_segments) == 1 and keep_segments[0][0] == 0:
-        # No ads to remove, just copy
-        subprocess.run(["ffmpeg", "-y", "-i", input_path, "-c", "copy", output_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, "-y", "-i", input_path, "-c", "copy", output_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -88,32 +105,27 @@ def remove_ads(input_path: str, output_path: str, ad_intervals: list[tuple[int, 
             part = os.path.join(tmpdir, f"part{i}.mp3")
             part_files.append(part)
             subprocess.run([
-                "ffmpeg", "-y", "-i", input_path, 
+                ffmpeg, "-y", "-i", input_path,
                 "-ss", str(start), "-to", str(end),
                 "-c", "copy", part
             ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            
+
         list_file = os.path.join(tmpdir, "list.txt")
         with open(list_file, "w") as f:
             for p in part_files:
                 f.write(f"file '{p}'\n")
-                
+
         subprocess.run([
-            "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", list_file, 
+            ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", list_file,
             "-c", "copy", output_path
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-
-import pytz
-from kuku.api import Episode
-
 def get_premiere_schedules(episodes: list[Episode], show_id: int, show_name: str) -> list[Schedule]:
-    "Leiab API osade põhjal saate eetrisoleku ajad."
+    """Leiab API osade põhjal saate eetrisoleku ajad."""
     tz = pytz.timezone('Europe/Tallinn')
     schedules = set()
     for ep in episodes[:5]:
         dt = ep.published_at.astimezone(tz)
         schedules.add((dt.weekday(), dt.hour))
     return [Schedule(show_id=show_id, name=show_name, weekday=w, hour=h, duration_minutes=60) for w, h in schedules]
-

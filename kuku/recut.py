@@ -6,7 +6,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Union
 
 from kuku.live import get_ad_intervals, remove_ads
 from kuku.releases import GitHubClient
@@ -24,7 +24,7 @@ def recut_episode(
     github: GitHubClient,
     show_id: int,
     episode_id: int,
-    ad_intervals: list[tuple[int, int]],
+    ad_intervals: Union[list[tuple[int, int]], str],
     library_path: Path,
     download_func: Callable[[str, Path], None] = None,
     remove_ads_func: Callable[[str, str, list[tuple[int, int]]], None] = None,
@@ -58,8 +58,12 @@ def recut_episode(
         print(f"Laen alla lähtefaili ({source_asset_name}): {download_url}...")
         download(download_url, input_mp3)
 
-        print(f"Lõikan reklaamid vahemikega: {ad_intervals}...")
-        do_remove_ads(str(input_mp3), str(output_mp3), ad_intervals)
+        intervals_to_use = ad_intervals
+        if ad_intervals == "auto" or (isinstance(ad_intervals, list) and not ad_intervals):
+            intervals_to_use = get_ad_intervals("auto", audio_path=input_mp3)
+
+        print(f"Lõikan reklaamid vahemikega: {intervals_to_use}...")
+        do_remove_ads(str(input_mp3), str(output_mp3), intervals_to_use)
 
         duration_sec = get_mp3_duration(output_mp3)
         print(f"Uus kestus: {duration_sec} sekundit ({duration_sec // 60}m {duration_sec % 60}s)")
@@ -90,7 +94,7 @@ def main():
     parser = argparse.ArgumentParser(description="Kuku osa uuesti lõikaja")
     parser.add_argument("--show-id", type=int, required=True, help="Saate ID (nt 514)")
     parser.add_argument("--episode-id", type=int, required=True, help="Osa ID (nt 1792141202)")
-    parser.add_argument("--ad-times", type=str, required=True, help="Reklaamide vahemikud (nt '0-1:55, 11:10-13:20, 24:10-25:00, 35:50-37:50')")
+    parser.add_argument("--ad-times", type=str, required=True, help="Reklaamide vahemikud (nt 'auto' või '0-1:55, 11:10-13:20, 24:10-25:00, 35:50-37:50')")
 
     args = parser.parse_args()
 
@@ -101,7 +105,7 @@ def main():
         sys.exit(1)
 
     gh = GitHubClient(repo, token)
-    intervals = get_ad_intervals(args.ad_times)
+    intervals = "auto" if args.ad_times.lower() == "auto" else get_ad_intervals(args.ad_times)
     library_path = DATA_DIR / "library.json"
     recut_episode(gh, args.show_id, args.episode_id, intervals, library_path)
 

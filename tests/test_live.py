@@ -8,7 +8,7 @@ def test_get_ad_intervals_auto():
     # 'auto' should return refined Kuku ad blocks for live recordings in seconds:
     # 0-6:55 (news+ads), 16:10-18:20 (ads), 29:10-34:10 (mid-hour news+ads), 45:50-47:50 (ads)
     intervals = get_ad_intervals("auto")
-    assert intervals == [(0, 415), (970, 1100), (1750, 2050), (2750, 2870)]
+    assert intervals == [(0, 418), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
 
 def test_get_ad_intervals_custom():
     intervals = get_ad_intervals("10-15,45-50")
@@ -104,7 +104,7 @@ def test_remove_ads(tmp_path, monkeypatch):
     assert called_args[2][7] == "999999"
     
     # Verify the concat call
-    assert called_args[3][0] == "ffmpeg"
+    assert "ffmpeg" in called_args[3][0].lower()
     assert "-f" in called_args[3]
     assert "concat" in called_args[3]
 
@@ -203,3 +203,13 @@ def test_record_live_pulls_before_updating_library(monkeypatch, tmp_path):
 
 
 
+
+
+def test_get_ad_intervals_with_audio_path_calls_detector(tmp_path, monkeypatch):
+    import kuku.jingles as jingles
+    fake_mp3 = tmp_path / "audio.mp3"
+    fake_mp3.write_bytes(b"dummy")
+
+    monkeypatch.setattr(jingles, "detect_ad_intervals", lambda path: [(100, 200)])
+    res = get_ad_intervals("auto", audio_path=fake_mp3)
+    assert res == [(100, 200)]

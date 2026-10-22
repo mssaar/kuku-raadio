@@ -82,8 +82,6 @@ def main():
     now = datetime.now(timezone.utc)
     episode_id = int(now.timestamp())
 
-    ad_intervals = get_ad_intervals(args.ad_times)
-
     with tempfile.TemporaryDirectory() as tmpdir:
         raw_mp3 = Path(tmpdir) / "raw.mp3"
         clean_mp3 = Path(tmpdir) / f"{episode_id}.mp3"
@@ -92,9 +90,10 @@ def main():
         print(f"Salvestan {args.duration} min striimi...")
         record_stream(STREAM_URL, str(raw_mp3), args.duration * 60)
 
-        # 2. Reklaamide eemaldamine
+        # 2. Reklaamide eemaldamine (kõllituvastusega toorfailist)
+        ad_intervals = get_ad_intervals(args.ad_times, audio_path=raw_mp3)
         if ad_intervals:
-            print("Eemaldan reklaamid...")
+            print(f"Eemaldan reklaamid ({len(ad_intervals)} intervalli: {ad_intervals})...")
             remove_ads(str(raw_mp3), str(clean_mp3), ad_intervals)
         else:
             clean_mp3 = raw_mp3
