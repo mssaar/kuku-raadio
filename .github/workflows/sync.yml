@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["site/**", "kuku/**", ".github/workflows/sync.yml"]
+    paths: ["site/**", "kuku/**", "tests/**", "requirements.txt", ".github/workflows/sync.yml"]
 
 concurrency:
   group: kuku-sync
