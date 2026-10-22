@@ -39,18 +39,23 @@ def recut_episode(
 
     assets = github.list_assets(release)
     asset_name = f"{episode_id}.mp3"
-    if asset_name not in assets:
-        raise ValueError(f"Faili {asset_name} ei leitud release'ist {tag}.")
+    raw_asset_name = f"raw-{episode_id}.mp3"
 
-    target_asset = assets[asset_name]
-    label = target_asset.get("label") or f"Osa {episode_id}"
-    download_url = target_asset["browser_download_url"]
+    # Eelistame toorsalvestust, et vältida juba kärbitud faili uuesti lõikamist
+    source_asset_name = raw_asset_name if raw_asset_name in assets else asset_name
+    if source_asset_name not in assets:
+        raise ValueError(f"Faili {asset_name} ega {raw_asset_name} ei leitud release'ist {tag}.")
+
+    source_asset = assets[source_asset_name]
+    clean_asset = assets.get(asset_name, source_asset)
+    label = clean_asset.get("label") or f"Osa {episode_id}"
+    download_url = source_asset["browser_download_url"]
 
     with tempfile.TemporaryDirectory() as tmpdir:
         input_mp3 = Path(tmpdir) / "source.mp3"
         output_mp3 = Path(tmpdir) / asset_name
 
-        print(f"Laen alla olemasoleva osa: {download_url}...")
+        print(f"Laen alla lähtefaili ({source_asset_name}): {download_url}...")
         download(download_url, input_mp3)
 
         print(f"Lõikan reklaamid vahemikega: {ad_intervals}...")
@@ -59,8 +64,9 @@ def recut_episode(
         duration_sec = get_mp3_duration(output_mp3)
         print(f"Uus kestus: {duration_sec} sekundit ({duration_sec // 60}m {duration_sec % 60}s)")
 
-        print(f"Kustutan vana asseti {target_asset['id']}...")
-        github.delete_asset(target_asset["id"])
+        if asset_name in assets:
+            print(f"Kustutan vana lõigatud asseti {assets[asset_name]['id']}...")
+            github.delete_asset(assets[asset_name]["id"])
 
         print(f"Laen uue lõigatud faili release'i {tag} alla...")
         new_asset = github.upload_asset(release, str(output_mp3), asset_name, label)
@@ -97,9 +103,7 @@ def main():
     gh = GitHubClient(repo, token)
     intervals = get_ad_intervals(args.ad_times)
     library_path = DATA_DIR / "library.json"
-
     recut_episode(gh, args.show_id, args.episode_id, intervals, library_path)
-    print("Osa uuesti lõigatud ja uuendatud!")
 
 
 if __name__ == "__main__":

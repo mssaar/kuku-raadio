@@ -105,3 +105,68 @@ def test_recut_episode_downloads_cuts_reuploads_and_updates_library(monkeypatch,
     ep = saved_lib["shows"][0]["episodes"][0]
     assert ep["duration_seconds"] == 2585
     assert new_duration == 2585
+
+
+def test_recut_episode_prefers_raw_asset_if_available(tmp_path):
+    downloaded = []
+
+    def mock_download(url, dest):
+        downloaded.append((url, dest))
+        Path(dest).write_bytes(b"dummy_data_160000_bytes" + b"\0" * 160000)
+
+    cuts = []
+
+    def mock_remove_ads(inp, outp, intervals):
+        cuts.append((inp, outp, intervals))
+        Path(outp).write_bytes(b"cut" + b"\0" * (16000 * 2500 - 3))
+
+    gh = DummyGitHub()
+    # Add raw asset to dummy release
+    gh.releases["saade-514"]["assets"].append({
+        "id": 101,
+        "name": "raw-1792141202.mp3",
+        "browser_download_url": "https://gh/download/raw-1792141202.mp3",
+        "label": "Kahe vahel (16.10.2026) (Toorsalvestus)",
+    })
+
+    lib_file = tmp_path / "library.json"
+    lib_file.write_text(
+        json.dumps({
+            "shows": [
+                {
+                    "id": 514,
+                    "name": "Kahe vahel",
+                    "episodes": [
+                        {
+                            "id": 1792141202,
+                            "title": "Kahe vahel (16.10.2026)",
+                            "duration_seconds": 2635,
+                            "url": "https://gh/download/1792141202.mp3",
+                        }
+                    ],
+                }
+            ]
+        }),
+        encoding="utf-8",
+    )
+
+    new_duration = recut_episode(
+        github=gh,
+        show_id=514,
+        episode_id=1792141202,
+        ad_intervals=[(0, 100)],
+        library_path=lib_file,
+        download_func=mock_download,
+        remove_ads_func=mock_remove_ads,
+    )
+
+    # Should have downloaded the RAW asset
+    assert len(downloaded) == 1
+    assert downloaded[0][0] == "https://gh/download/raw-1792141202.mp3"
+
+    # Should have deleted the clean asset (id 100), NOT raw asset (id 101)
+    assert gh.deleted_assets == [100]
+
+    # Should upload the new clean asset
+    assert gh.uploaded[0][2] == "1792141202.mp3"
+    assert new_duration == 2500
