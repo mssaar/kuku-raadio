@@ -76,6 +76,12 @@ def main():
     parser.add_argument("--duration", type=int, required=True, help="Pikkus minutites")
     parser.add_argument("--ad-times", type=str, default="", help="'auto' või komaga eraldatud min-max (nt '0-5,30-35')")
     parser.add_argument("--episode-title", type=str, required=True, help="Osa pealkiri")
+    parser.add_argument(
+        "--cut-start",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Lõika saate algusest uudised ja reklaamid maha (kui salvestus algas täistunnil)",
+    )
 
     args = parser.parse_args()
 
@@ -91,7 +97,7 @@ def main():
         record_stream(STREAM_URL, str(raw_mp3), args.duration * 60)
 
         # 2. Reklaamide eemaldamine (kõllituvastusega toorfailist)
-        ad_intervals = get_ad_intervals(args.ad_times, audio_path=raw_mp3)
+        ad_intervals = get_ad_intervals(args.ad_times, audio_path=raw_mp3, cut_start=args.cut_start)
         if ad_intervals:
             print(f"Eemaldan reklaamid ({len(ad_intervals)} intervalli: {ad_intervals})...")
             remove_ads(str(raw_mp3), str(clean_mp3), ad_intervals)

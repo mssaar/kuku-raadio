@@ -210,6 +210,56 @@ def test_get_ad_intervals_with_audio_path_calls_detector(tmp_path, monkeypatch):
     fake_mp3 = tmp_path / "audio.mp3"
     fake_mp3.write_bytes(b"dummy")
 
-    monkeypatch.setattr(jingles, "detect_ad_intervals", lambda path: [(100, 200)])
-    res = get_ad_intervals("auto", audio_path=fake_mp3)
+    called_kwargs = {}
+    def fake_detect(path, assets_dir=None, cut_start=True):
+        called_kwargs["cut_start"] = cut_start
+        return [(100, 200)]
+
+    monkeypatch.setattr(jingles, "detect_ad_intervals", fake_detect)
+    res = get_ad_intervals("auto", audio_path=fake_mp3, cut_start=False)
     assert res == [(100, 200)]
+    assert called_kwargs["cut_start"] is False
+
+
+def test_get_ad_intervals_fallback_omits_intro_when_cut_start_false():
+    res_default = get_ad_intervals("auto", cut_start=True)
+    assert (0, 418) in res_default
+
+    res_no_cut = get_ad_intervals("auto", cut_start=False)
+    assert (0, 418) not in res_no_cut
+    assert any(s > 0 for s, e in res_no_cut)
+
+
+def test_auto_record_mid_show_adds_no_cut_start(monkeypatch, tmp_path):
+    import json
+    import subprocess
+    import kuku.auto_record as auto_record
+    from kuku.api import Episode
+
+    shows_file = tmp_path / "shows.json"
+    shows_file.write_text(json.dumps([{"id": 209, "name": "Digitund"}]), encoding="utf-8")
+    monkeypatch.setattr(auto_record, "DATA_DIR", tmp_path)
+
+    tz = pytz.timezone("Europe/Tallinn")
+    # 11:27 on Monday - 27 minutes into Digitund
+    fake_now = tz.localize(datetime(2026, 10, 26, 11, 27, 25))
+
+    ep = Episode(
+        id=1,
+        title="Digitund",
+        published_at=tz.localize(datetime(2026, 10, 19, 11, 0)).astimezone(timezone.utc),
+        is_premium=False,
+        is_playable=True,
+        duration_seconds=3600,
+    )
+    monkeypatch.setattr(auto_record.KukuClient, "list_episodes", lambda self, sid, since: [ep])
+
+    cmds = []
+    monkeypatch.setattr(subprocess, "run", lambda cmd, **kw: cmds.append(cmd))
+
+    auto_record.main(now_override=fake_now)
+
+    assert len(cmds) == 1
+    assert "--duration" in cmds[0]
+    assert cmds[0][cmds[0].index("--duration") + 1] == "33"
+    assert "--no-cut-start" in cmds[0]

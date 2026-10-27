@@ -56,13 +56,16 @@ def _find_peaks(norm_corr: np.ndarray, sr: int, threshold: float = 0.65, min_dis
     return [(idx / sr, float(norm_corr[idx])) for idx in peaks]
 
 
-def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None) -> list[tuple[int, int]]:
+def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_start: bool = True) -> list[tuple[int, int]]:
     """Tuvastab helifailist reklaami alguskõllid ja lõpukõllid ning tagastab eemaldatavad intervallid."""
     assets = assets_dir or ASSETS_DIR
     start_tpl_path = assets / "puhas_alguskoll.wav"
     if not start_tpl_path.exists():
         print(f"Hoiatus: Etalonkõll {start_tpl_path} puudub!")
-        return [(0, 418), (1200, 1320), (2000, 2120), (2740, 2860), (3458, 3600)]
+        fallback = [(0, 418), (1200, 1320), (2000, 2120), (2740, 2860), (3458, 3600)]
+        if not cut_start:
+            fallback = [(s, e) for s, e in fallback if s > 0]
+        return fallback
 
     audio = load_audio(audio_path, sr=SAMPLE_RATE)
     audio_len_sec = len(audio) / SAMPLE_RATE
@@ -90,13 +93,15 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None) -> list
             end_tpl_norms.append((t_zero, np.sum(t_zero ** 2), len(t) / SAMPLE_RATE))
 
     # Reegel:
-    # 1. 0:00 - 6:58 (418s) lõigatakse alati (uudised ja avareklaamid)
-    # 2. 57:38 (3458s) kuni saate lõpp lõigatakse alati
-    # 3. Vahepausid on need, mis jäävad vahemikku 418s kuni 3458s
-    mid_show_starts = [p for p in all_start_peaks if 418 <= p[0] <= 3458]
+    # 1. 0:00 - 6:58 (418s) lõigatakse ainult siis, kui cut_start on tõene (täistunnil alustades)
+    # 2. 57:38 (3458s) kuni saate lõpp lõigatakse ainult siis, kui fail on piisavalt pikk
+    # 3. Vahepausid on need, mis jäävad alguse ja lõpu vahele
+    min_mid_start = 418 if cut_start else 0
+    mid_show_starts = [p for p in all_start_peaks if min_mid_start <= p[0] <= 3458]
 
     intervals: list[tuple[int, int]] = []
-    intervals.append((0, 418))
+    if cut_start:
+        intervals.append((0, 418))
 
     for start_sec, sim in mid_show_starts:
         # Otsime lõpukõlli aknast [start_sec + 60s, start_sec + 160s]
@@ -129,6 +134,7 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None) -> list
 
         intervals.append((int(round(start_sec)), end_time))
 
-    # Lõpu kärpimine
-    intervals.append((3458, int(round(audio_len_sec))))
+    # Lõpu kärpimine (ainult siis, kui salvestus ulatub saate lõpuni)
+    if audio_len_sec > 3458:
+        intervals.append((3458, int(round(audio_len_sec))))
     return sorted(intervals)

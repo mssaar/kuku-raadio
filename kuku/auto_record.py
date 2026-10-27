@@ -111,7 +111,8 @@ def main(now_override: datetime | None = None):
                         print(f"Saade '{schedule.name}' algab täistunnil {schedule.hour:02d}:00. Ootan {wait_sec} sekundit...")
                         time.sleep(wait_sec)
                         now = now + timedelta(seconds=wait_sec)
-                    print(f"Käivitan '{schedule.name}' otse-salvestuse ({duration_min} min)!")
+                    is_mid_show = (wait_sec == 0 and now.minute >= 2)
+                    print(f"Käivitan '{schedule.name}' otse-salvestuse ({duration_min} min, poole pealt={is_mid_show})!")
                     cmd = [
                         sys.executable, "-m", "kuku.record_live",
                         "--show-id", str(schedule.show_id),
@@ -120,6 +121,8 @@ def main(now_override: datetime | None = None):
                         "--duration", str(duration_min),
                         "--ad-times", "auto"
                     ]
+                    if is_mid_show:
+                        cmd.append("--no-cut-start")
                     subprocess.run(cmd, check=True)
                     return  # Salvestame korraga ühe (esimese mis klapib)
         except Exception as e:
