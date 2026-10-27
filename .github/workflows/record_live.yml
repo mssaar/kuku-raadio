@@ -52,8 +52,6 @@ jobs:
           python-version: "3.12"
       - name: Setup FFmpeg
         uses: AnimMouse/setup-ffmpeg@v1
-        with:
-          version: 7.1
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Kontrolli ja salvesta
