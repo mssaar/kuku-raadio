@@ -5,6 +5,14 @@
    "name": "Buum",
    "episodes": [
     {
+     "id": 1793185202,
+     "title": "Buum (28.10.2026)",
+     "published_at": "2026-10-28T11:00:02Z",
+     "expires_at": "2027-04-28T11:00:02Z",
+     "duration_seconds": 2770,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-214/1793185202.mp3"
+    },
+    {
      "id": 1792576802,
      "title": "Buum (21.10.2026)",
      "published_at": "2026-10-21T10:00:02Z",
