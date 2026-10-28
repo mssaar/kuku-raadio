@@ -571,7 +571,7 @@ function findEpisode(id) {
 function play(id) {
   const found = findEpisode(id);
   if (!found) return;
-  if (state.current?.episode.id === id) {
+  if (state.current?.episode.id === id && !audio.error) {
     audio.paused ? audio.play() : audio.pause();
     return;
   }
@@ -579,7 +579,11 @@ function play(id) {
   state.current = found;
   audio.src = found.episode.url;
   const start = loadPosition(store, id);
-  audio.addEventListener("loadedmetadata", () => { if (start) audio.currentTime = start; }, { once: true });
+  if (start) {
+    audio.addEventListener("loadedmetadata", () => {
+      try { audio.currentTime = start; } catch {}
+    }, { once: true });
+  }
   audio.play().catch(() => {});
   updateMini();
   updateMediaSession();
@@ -788,7 +792,9 @@ async function init() {
     }
   }
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker.register("./sw.js").then(reg => {
+      reg.update().catch(() => {});
+    }).catch(() => {});
   }
   route();
 }

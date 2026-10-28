@@ -1,4 +1,4 @@
-const CACHE_NAME = "kuku-v1";
+const CACHE_NAME = "kuku-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -17,8 +17,9 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
 });
 
@@ -31,11 +32,27 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
+
   const url = new URL(event.request.url);
-  // Ära vahemälusta andmefaile ega meediafaile (need uuenevad pidevalt või on hiiglaslikud)
-  if (url.pathname.includes("/data/") || url.pathname.endsWith(".mp3")) {
+
+  // ÄRA KUNAGI puutu teiste domeenide päringuid (GitHub Releases helifailid, ümbersuunamised, CDN jne)!
+  // See hoiab ära helivoogude hangumise ja Range-päringute katkemise.
+  if (url.origin !== self.location.origin) {
     return;
   }
+
+  // Ära puutu helifaile, andmefaile ega Range päringuid
+  if (
+    event.request.destination === "audio" ||
+    event.request.destination === "video" ||
+    event.request.headers.has("range") ||
+    url.pathname.includes("/data/") ||
+    url.pathname.endsWith(".mp3")
+  ) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cached => cached || fetch(event.request))
   );
