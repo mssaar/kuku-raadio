@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-28T15:18:19Z",
+ "updated_at": "2026-10-28T15:54:12Z",
  "shows": [
   {
    "id": 4714,
@@ -450,6 +450,12 @@
    "name": "Otse Postimehest",
    "description": "Ühiskondlikult olulised teemad ja inimesed. Siin ja praegu.",
    "image": "https://f302.pmo.ee/AaD8jpf8D5PXuIL377PMG1vBh_0=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/8CbMZ4sob8mmo1udx6uCt8FstJDm3mwCFa6wk1Hd.jpg"
+  },
+  {
+   "id": 111795,
+   "name": "Otse Postimehest.",
+   "description": "\"Otse Postimehest\" veebisaate selle nädala kõige olulisem episood on pühapäeviti kordusena Kuku eetris.",
+   "image": "https://f302.pmo.ee/yWHYg8p8MIp5XwHgjSMZmZ-2UFg=/fit-in/250x250/smart/filters:quality(90):format(webp)/https://f303.pmo.ee/FAzCtL5Vv8RbAEOS3jSZEDl4PAdG3h8VL3GoMmds.png"
   },
   {
    "id": 111574,
