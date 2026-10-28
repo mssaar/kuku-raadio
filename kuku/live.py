@@ -11,12 +11,12 @@ import pytz
 from kuku.api import Episode
 
 # Vaikimisi varuintervallid, kui helifaili pole antud või automaattuvastus ei käivitu:
-# 1. 0:00 - 6:58 (alguse uudised ja reklaamid: 0 - 418 s)
+# 1. 0:00 - 6:53 (alguse uudised ja reklaamid: 0 - 413 s, 5s varuga enne saadet)
 # 2. 20:28 - 21:42 (1. reklaamipaus: 1228 - 1302 s)
 # 3. 33:10 - 34:49 (2. reklaamipaus: 1990 - 2089 s)
 # 4. 45:44 - 47:54 (3. reklaamipaus: 2744 - 2874 s)
 # 5. 57:38 - 60:00 (lõpukõll ja järgmise tunni algus: 3458 - 3600 s)
-DEFAULT_AUTO_INTERVALS = [(0, 418), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
+DEFAULT_AUTO_INTERVALS = [(0, 413), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
 
 
 @dataclass

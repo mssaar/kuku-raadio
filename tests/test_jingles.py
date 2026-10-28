@@ -30,7 +30,7 @@ def test_detect_ad_intervals_missing_assets(tmp_path):
     fake_audio.write_bytes(b"dummy")
 
     intervals = detect_ad_intervals(fake_audio, assets_dir=empty_dir)
-    assert intervals == [(0, 418), (1200, 1320), (2000, 2120), (2740, 2860), (3458, 3600)]
+    assert intervals == [(0, 413), (1200, 1320), (2000, 2120), (2740, 2860), (3458, 3600)]
 
     intervals_no_cut = detect_ad_intervals(fake_audio, assets_dir=empty_dir, cut_start=False)
     assert intervals_no_cut == [(1200, 1320), (2000, 2120), (2740, 2860), (3458, 3600)]

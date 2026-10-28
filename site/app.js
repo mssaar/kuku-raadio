@@ -20,6 +20,7 @@ const ICONS = {
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>',
   logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/></svg>',
   mark: '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#26262a"/><circle cx="32" cy="32" r="18" fill="none" stroke="#f5b73b" stroke-width="5"/><circle cx="32" cy="32" r="6" fill="#f5b73b"/></svg>',
 };
@@ -309,7 +310,10 @@ function renderHome() {
   view.innerHTML = `
     <header class="topbar">
       <div><h1>${greeting()}</h1>${checked ? `<p class="checked">${checked}</p>` : ""}</div>
-      <button class="icon-btn" id="logout" aria-label="Logi välja" title="Logi välja">${ICONS.logout}</button>
+      <div class="topbar__actions">
+        <a class="icon-btn" href="#/seaded" aria-label="Seaded ja paigaldus" title="Seaded ja paigaldus">${ICONS.gear}</a>
+        <button class="icon-btn" id="logout" aria-label="Logi välja" title="Logi välja">${ICONS.logout}</button>
+      </div>
     </header>
     ${resume ? `
       <section class="section section--first" aria-labelledby="resume-h">
@@ -485,6 +489,79 @@ function renderResults() {
   }));
 }
 
+/* ---------------- settings & pwa ---------------- */
+
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", ev => {
+  ev.preventDefault();
+  deferredInstallPrompt = ev;
+  const btn = $("pwa-install-btn");
+  if (btn) btn.hidden = false;
+});
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  if ((location.hash || "").startsWith("#/seaded")) renderSettings();
+});
+
+function isStandalone() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function renderSettings() {
+  setChrome(true);
+  const installed = isStandalone();
+
+  view.innerHTML = `
+    <a class="back" href="#/">${ICONS.left} Tagasi</a>
+    <header class="settings-head">
+      <h1>Seaded ja paigaldus</h1>
+      <p class="settings-sub">Paigalda Kuku veebirakendus telefonisse, et saaksid seda otse avakuvalt käivitada.</p>
+    </header>
+
+    <section class="settings-card">
+      <h2>Rakenduse paigaldamine</h2>
+      ${installed ? `
+        <div class="install-status install-status--ok">
+          ${ICONS.check}
+          <div>
+            <strong>Rakendus on paigaldatud</strong>
+            <p>Kuku töötab eraldi rakendusena sinu seadmes.</p>
+          </div>
+        </div>
+      ` : `
+        <div class="install-box">
+          <button class="pill pill--primary install-btn" id="pwa-install-btn" ${deferredInstallPrompt ? "" : "hidden"}>
+            ${ICONS.down} Paigalda Kuku äpp
+          </button>
+          <div class="install-steps">
+            <div class="install-step">
+              <span class="step-num">iPhone / iPad (Safari)</span>
+              <p>Vajuta Safari allservas nuppu <strong>Jaga</strong> (ruut noolega üles) ja vali <strong>„Lisa avaekraanile“</strong> (Add to Home Screen).</p>
+            </div>
+            <div class="install-step">
+              <span class="step-num">Android (Chrome)</span>
+              <p>Vajuta Chrome'i menüünuppu (<strong>⋮</strong> üleval paremal) ja vali <strong>„Paigalda rakendus“</strong> või <strong>„Lisa avakuvale“</strong>.</p>
+            </div>
+          </div>
+        </div>
+      `}
+    </section>
+  `;
+
+  const btn = $("pwa-install-btn");
+  if (btn) {
+    btn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice.outcome === "accepted") {
+        deferredInstallPrompt = null;
+        renderSettings();
+      }
+    });
+  }
+}
+
 /* ---------------- player ---------------- */
 
 function findEpisode(id) {
@@ -640,6 +717,8 @@ function updateMediaSession() {
     seekbackward: () => seekBy(-15),
     seekforward: () => seekBy(30),
     seekto: d => { audio.currentTime = d.seekTime; },
+    nexttrack: () => seekBy(30),
+    previoustrack: () => seekBy(-15),
   };
   for (const [action, fn] of Object.entries(handlers)) {
     try { navigator.mediaSession.setActionHandler(action, fn); } catch { /* toetamata */ }
@@ -668,6 +747,8 @@ function route(message) {
   } else if (hash.startsWith("#/otsi")) {
     document.querySelector('[data-tab="search"]').setAttribute("aria-current", "page");
     renderSearch();
+  } else if (hash.startsWith("#/seaded")) {
+    renderSettings();
   } else {
     document.querySelector('[data-tab="home"]').setAttribute("aria-current", "page");
     renderHome();
@@ -705,6 +786,9 @@ async function init() {
         return route(EXPIRED);
       }
     }
+  }
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
   route();
 }

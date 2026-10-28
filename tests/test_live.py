@@ -6,9 +6,9 @@ from kuku.live import get_ad_intervals, should_record_now, compute_recording_pla
 
 def test_get_ad_intervals_auto():
     # 'auto' should return refined Kuku ad blocks for live recordings in seconds:
-    # 0-6:55 (news+ads), 16:10-18:20 (ads), 29:10-34:10 (mid-hour news+ads), 45:50-47:50 (ads)
+    # 0-6:53 (news+ads with 5s show safety margin), 20:28-21:42, 33:10-34:49, 45:44-47:54, 57:38-60:00
     intervals = get_ad_intervals("auto")
-    assert intervals == [(0, 418), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
+    assert intervals == [(0, 413), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
 
 def test_get_ad_intervals_custom():
     intervals = get_ad_intervals("10-15,45-50")
@@ -223,10 +223,10 @@ def test_get_ad_intervals_with_audio_path_calls_detector(tmp_path, monkeypatch):
 
 def test_get_ad_intervals_fallback_omits_intro_when_cut_start_false():
     res_default = get_ad_intervals("auto", cut_start=True)
-    assert (0, 418) in res_default
+    assert (0, 413) in res_default
 
     res_no_cut = get_ad_intervals("auto", cut_start=False)
-    assert (0, 418) not in res_no_cut
+    assert (0, 413) not in res_no_cut
     assert any(s > 0 for s, e in res_no_cut)
 
 

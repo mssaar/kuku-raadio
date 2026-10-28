@@ -57,6 +57,7 @@ body.no-chrome .view { padding-bottom: 40px; }
 
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .topbar h1 { font-size: 1.75rem; font-weight: 800; }
+.topbar__actions { display: flex; align-items: center; gap: 6px; }
 .checked { color: var(--text-3); font-size: .8125rem; margin-top: 4px; }
 
 /* ---------- banner ---------- */
@@ -321,6 +322,42 @@ body.no-chrome .view { padding-bottom: 40px; }
 
 .spinner { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- seaded ja paigaldus ---------- */
+.settings-head { margin-bottom: 24px; }
+.settings-head h1 { font-size: 1.75rem; font-weight: 800; }
+.settings-sub { color: var(--text-2); font-size: .9375rem; margin-top: 6px; line-height: 1.45; }
+
+.settings-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px;
+}
+.settings-card h2 { font-size: 1.125rem; font-weight: 700; margin-bottom: 14px; }
+
+.install-box { display: flex; flex-direction: column; gap: 16px; }
+.install-btn { align-self: flex-start; }
+
+.install-status {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: var(--radius);
+}
+.install-status--ok { background: #132b1a; border: 1px solid #1f4d2c; color: #85e09b; }
+.install-status svg { width: 22px; height: 22px; flex: none; margin-top: 2px; }
+.install-status strong { display: block; color: var(--text); font-size: .9375rem; font-weight: 700; margin-bottom: 2px; }
+.install-status p { font-size: .875rem; color: var(--text-2); margin-top: 2px; }
+
+.install-steps { display: flex; flex-direction: column; gap: 12px; }
+.install-step {
+  background: var(--surface-2); border-radius: var(--radius);
+  padding: 12px 14px; font-size: .875rem; line-height: 1.45;
+}
+.step-num {
+  display: inline-block; font-size: .75rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .05em; color: var(--accent);
+  margin-bottom: 4px;
+}
+.install-step p { color: var(--text-2); margin: 0; }
+.install-step strong { color: var(--text); }
 
 @media (min-width: 720px) {
   .view { padding-top: 40px; }
