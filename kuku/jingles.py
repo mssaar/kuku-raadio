@@ -62,7 +62,7 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
     start_tpl_path = assets / "puhas_alguskoll.wav"
     if not start_tpl_path.exists():
         print(f"Hoiatus: Etalonkõll {start_tpl_path} puudub!")
-        fallback = [(0, 413), (1200, 1320), (2000, 2120), (2740, 2860), (3458, 3600)]
+        fallback = [(0, 413), (1200, 1320), (2000, 2120), (2740, 2860), (3463, 3600)]
         if not cut_start:
             fallback = [(s, e) for s, e in fallback if s > 0]
         return fallback
@@ -94,10 +94,10 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
 
     # Reegel:
     # 1. 0:00 - 6:53 (413s, 5s varuga) lõigatakse ainult siis, kui cut_start on tõene (täistunnil alustades)
-    # 2. 57:38 (3458s) kuni saate lõpp lõigatakse ainult siis, kui fail on piisavalt pikk
+    # 2. 57:43 (3463s) kuni saate lõpp lõigatakse ainult siis, kui fail on piisavalt pikk
     # 3. Vahepausid on need, mis jäävad alguse ja lõpu vahele
     min_mid_start = 413 if cut_start else 0
-    mid_show_starts = [p for p in all_start_peaks if min_mid_start <= p[0] <= 3458]
+    mid_show_starts = [p for p in all_start_peaks if min_mid_start <= p[0] <= 3463]
 
     intervals: list[tuple[int, int]] = []
     if cut_start:
@@ -135,6 +135,6 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
         intervals.append((int(round(start_sec)), end_time))
 
     # Lõpu kärpimine (ainult siis, kui salvestus ulatub saate lõpuni)
-    if audio_len_sec > 3458:
-        intervals.append((3458, int(round(audio_len_sec))))
+    if audio_len_sec > 3463:
+        intervals.append((3463, int(round(audio_len_sec))))
     return sorted(intervals)

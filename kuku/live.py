@@ -15,8 +15,8 @@ from kuku.api import Episode
 # 2. 20:28 - 21:42 (1. reklaamipaus: 1228 - 1302 s)
 # 3. 33:10 - 34:49 (2. reklaamipaus: 1990 - 2089 s)
 # 4. 45:44 - 47:54 (3. reklaamipaus: 2744 - 2874 s)
-# 5. 57:38 - 60:00 (lõpukõll ja järgmise tunni algus: 3458 - 3600 s)
-DEFAULT_AUTO_INTERVALS = [(0, 413), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
+# 5. 57:43 - 60:00 (lõpukõll ja järgmise tunni algus: 3463 - 3600 s)
+DEFAULT_AUTO_INTERVALS = [(0, 413), (1228, 1302), (1990, 2089), (2744, 2874), (3463, 3600)]
 
 
 @dataclass

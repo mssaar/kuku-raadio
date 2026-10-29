@@ -6,9 +6,9 @@ from kuku.live import get_ad_intervals, should_record_now, compute_recording_pla
 
 def test_get_ad_intervals_auto():
     # 'auto' should return refined Kuku ad blocks for live recordings in seconds:
-    # 0-6:53 (news+ads with 5s show safety margin), 20:28-21:42, 33:10-34:49, 45:44-47:54, 57:38-60:00
+    # 0-6:53 (news+ads with 5s show safety margin), 20:28-21:42, 33:10-34:49, 45:44-47:54, 57:43-60:00
     intervals = get_ad_intervals("auto")
-    assert intervals == [(0, 413), (1228, 1302), (1990, 2089), (2744, 2874), (3458, 3600)]
+    assert intervals == [(0, 413), (1228, 1302), (1990, 2089), (2744, 2874), (3463, 3600)]
 
 def test_get_ad_intervals_custom():
     intervals = get_ad_intervals("10-15,45-50")
