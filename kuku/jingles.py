@@ -83,14 +83,12 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
 
     all_start_peaks = _find_peaks(norm_corr_start, SAMPLE_RATE, threshold=0.70, min_dist_sec=10.0)
 
-    # Laeme lõpukõllide etalonid
+    # Laeme lõpukõllide etalonid (kõik saadaolevad puhas_lopukoll_*.wav failid)
     end_tpl_norms = []
-    for i in [1, 2, 3]:
-        p = assets / f"puhas_lopukoll_{i}.wav"
-        if p.exists():
-            t = load_audio(p, sr=SAMPLE_RATE)
-            t_zero = t - np.mean(t)
-            end_tpl_norms.append((t_zero, np.sum(t_zero ** 2), len(t) / SAMPLE_RATE))
+    for p in sorted(assets.glob("puhas_lopukoll_*.wav")):
+        t = load_audio(p, sr=SAMPLE_RATE)
+        t_zero = t - np.mean(t)
+        end_tpl_norms.append((t_zero, np.sum(t_zero ** 2), len(t) / SAMPLE_RATE))
 
     # Reegel:
     # 1. 0:00 - 6:53 (413s, 5s varuga) lõigatakse ainult siis, kui cut_start on tõene (täistunnil alustades)

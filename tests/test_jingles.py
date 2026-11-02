@@ -34,3 +34,10 @@ def test_detect_ad_intervals_missing_assets(tmp_path):
 
     intervals_no_cut = detect_ad_intervals(fake_audio, assets_dir=empty_dir, cut_start=False)
     assert intervals_no_cut == [(1200, 1320), (2000, 2120), (2740, 2860), (3463, 3600)]
+
+
+def test_assets_contain_all_jingles():
+    from kuku.jingles import ASSETS_DIR
+    wavs = list(ASSETS_DIR.glob("puhas_lopukoll_*.wav"))
+    assert len(wavs) >= 4
+
