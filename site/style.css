@@ -176,6 +176,7 @@ body.no-chrome .view { padding-bottom: 40px; }
 .show-head .cover { width: clamp(120px, 34vw, 200px); }
 .show-head h1 { font-size: clamp(1.75rem, 6vw, 2.75rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
 .show-head p { color: var(--text-2); margin-top: 8px; font-size: .9375rem; }
+.show-topbar { display: flex; align-items: center; justify-content: space-between; }
 .back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-2); text-decoration: none; font-weight: 600; font-size: .9375rem; margin-left: -6px; min-height: 44px; }
 .back svg { width: 22px; height: 22px; }
 .back:hover { color: var(--text); }
