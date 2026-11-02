@@ -1,5 +1,6 @@
 recordings/
 scratch/
+kuulamiseks/
 __pycache__/
 .pytest_cache/
 .superpowers/
