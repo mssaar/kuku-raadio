@@ -27,6 +27,14 @@
    "name": "Digitund",
    "episodes": [
     {
+     "id": 1793610001,
+     "title": "Digitund (02.11.2026)",
+     "published_at": "2026-11-02T09:00:01Z",
+     "expires_at": "2027-05-03T09:00:01Z",
+     "duration_seconds": 2780,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-209/1793610001.mp3"
+    },
+    {
      "id": 309881,
      "title": "Digitund 26-10-2026",
      "published_at": "2026-10-26T09:00:00Z",
