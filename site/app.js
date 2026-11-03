@@ -4,6 +4,7 @@ import { searchShows } from "./lib/search.js";
 import { getFile, putFile } from "./lib/github.js";
 import { savePosition, loadPosition, isFinished, progressFraction, lastInProgress } from "./lib/progress.js";
 import { isKukuAdTime, KUKU_STREAM_URL, SWISS_POP_STREAM_URL } from "./lib/live_schedule.js";
+import { LiveAudioDetector } from "./lib/live_detector.js";
 
 const SHOWS_PATH = "site/data/shows.json";
 const AUTH_PATH = "site/data/auth.json";
@@ -634,6 +635,61 @@ function renderSettings() {
 
 /* ---------------- live player ---------------- */
 
+let liveDetector = null;
+let audioCtx = null;
+let kukuSource = null;
+let audioProcessor = null;
+
+async function getLiveDetector() {
+  if (liveDetector) return liveDetector;
+  liveDetector = new LiveAudioDetector({
+    onAdStart: ({ score }) => {
+      console.log(`Kuku reklaamikõll tuvastatud (skoor ${score.toFixed(2)}) -> lülitun muusikale`);
+      if (liveState.playing && liveState.autoReplace && !liveState.manualOverride) {
+        crossfadeTo("swiss");
+      }
+    },
+    onAdEnd: ({ score, jingle, fallback }) => {
+      console.log(`Kuku reklaami lõpukõll tuvastatud (${fallback ? "turvaaeg" : jingle}) -> tagasi Kukule`);
+      if (liveState.playing && !liveState.manualOverride) {
+        crossfadeTo("kuku");
+      }
+    },
+  });
+  await liveDetector.init("data/jingles.json");
+  return liveDetector;
+}
+
+function initLiveWebAudio() {
+  if (kukuSource || typeof window === "undefined") return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+
+  try {
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+
+    kukuSource = audioCtx.createMediaElementSource(liveKuku);
+    audioProcessor = audioCtx.createScriptProcessor(4096, 1, 1);
+    audioProcessor.onaudioprocess = ev => {
+      if (liveDetector && liveState.playing) {
+        const input = ev.inputBuffer.getChannelData(0);
+        liveDetector.processAudio(input, audioCtx.sampleRate);
+      }
+    };
+
+    kukuSource.connect(audioProcessor);
+    kukuSource.connect(audioCtx.destination);
+
+    const muteNode = audioCtx.createGain();
+    muteNode.gain.value = 0;
+    audioProcessor.connect(muteNode);
+    muteNode.connect(audioCtx.destination);
+  } catch (err) {
+    console.warn("Web Audio API kõllituvastuse ühendamine ebaõnnestus (kasutan varuajakava):", err);
+  }
+}
+
 function playLive() {
   if (state.current && !audio.paused) {
     audio.pause();
@@ -646,17 +702,24 @@ function playLive() {
   liveState.activeSource = target;
   liveState.playing = true;
 
+  // Alati käivitame Kuku striimi, et helivoo kõllituvastaja saaks taustal kuulata
+  liveKuku.src = LIVE_KUKU_URL;
   if (target === "kuku") {
     try { liveSwiss.pause(); liveSwiss.src = ""; } catch {}
-    liveKuku.src = LIVE_KUKU_URL;
     liveKuku.volume = 1;
     liveKuku.play().catch(() => {});
   } else {
-    try { liveKuku.pause(); liveKuku.src = ""; } catch {}
+    liveKuku.volume = 0; // Kuku mängib vaikselt taustal kõllide kuulamiseks
+    liveKuku.play().catch(() => {});
     liveSwiss.src = LIVE_SWISS_URL;
     liveSwiss.volume = 1;
     liveSwiss.play().catch(() => {});
   }
+
+  initLiveWebAudio();
+  getLiveDetector().then(det => {
+    if (det) det.setState(target === "swiss" ? "ad" : "show");
+  }).catch(() => {});
 
   updateLiveUI();
   updateLiveMediaSession();
@@ -667,6 +730,7 @@ function pauseLive() {
   liveState.playing = false;
   liveState.fading = false;
   liveState.manualOverride = false;
+  if (liveDetector) liveDetector.reset();
   try {
     liveKuku.pause();
     liveKuku.src = "";
@@ -689,43 +753,73 @@ function crossfadeTo(newSource) {
   if (liveState.activeSource === newSource || !liveState.playing || liveState.fading) return;
   liveState.fading = true;
 
-  const oldAudio = liveState.activeSource === "kuku" ? liveKuku : liveSwiss;
-  const newAudio = newSource === "kuku" ? liveKuku : liveSwiss;
-  const targetUrl = newSource === "kuku" ? LIVE_KUKU_URL : LIVE_SWISS_URL;
+  if (newSource === "swiss") {
+    if (liveDetector) liveDetector.setState("ad");
+    liveSwiss.src = LIVE_SWISS_URL;
+    liveSwiss.volume = 0;
+    liveSwiss.play().catch(() => {});
 
-  newAudio.src = targetUrl;
-  newAudio.volume = 0;
-  newAudio.play().catch(() => {});
-
-  let step = 0;
-  const steps = 10;
-  const interval = setInterval(() => {
-    step++;
-    const ratio = step / steps;
-    try {
-      newAudio.volume = Math.min(1, Math.max(0, ratio));
-      oldAudio.volume = Math.min(1, Math.max(0, 1 - ratio));
-    } catch {}
-    if (step >= steps) {
-      clearInterval(interval);
+    let step = 0;
+    const steps = 10;
+    const interval = setInterval(() => {
+      step++;
+      const ratio = step / steps;
       try {
-        oldAudio.pause();
-        oldAudio.src = "";
-        newAudio.volume = 1;
+        liveSwiss.volume = Math.min(1, Math.max(0, ratio));
+        liveKuku.volume = Math.min(1, Math.max(0, 1 - ratio));
       } catch {}
-      liveState.activeSource = newSource;
-      liveState.fading = false;
-      updateLiveUI();
-      updateLiveMediaSession();
-      updateMini();
+      if (step >= steps) {
+        clearInterval(interval);
+        liveKuku.volume = 0; // Jääb taustal mängima, et kõllituvastaja kuuleks lõpukõlli!
+        liveSwiss.volume = 1;
+        liveState.activeSource = "swiss";
+        liveState.fading = false;
+        updateLiveUI();
+        updateLiveMediaSession();
+        updateMini();
+      }
+    }, 50);
+  } else {
+    // newSource === "kuku"
+    if (liveDetector) liveDetector.setState("show");
+    if (!liveKuku.src || liveKuku.paused) {
+      liveKuku.src = LIVE_KUKU_URL;
+      liveKuku.play().catch(() => {});
     }
-  }, 50);
+
+    let step = 0;
+    const steps = 10;
+    const interval = setInterval(() => {
+      step++;
+      const ratio = step / steps;
+      try {
+        liveKuku.volume = Math.min(1, Math.max(0, ratio));
+        liveSwiss.volume = Math.min(1, Math.max(0, 1 - ratio));
+      } catch {}
+      if (step >= steps) {
+        clearInterval(interval);
+        try {
+          liveSwiss.pause();
+          liveSwiss.src = "";
+        } catch {}
+        liveKuku.volume = 1;
+        liveState.activeSource = "kuku";
+        liveState.fading = false;
+        updateLiveUI();
+        updateLiveMediaSession();
+        updateMini();
+      }
+    }, 50);
+  }
 }
 
 function switchLiveSource(target) {
   if (!liveState.playing) return;
   const next = target || (liveState.activeSource === "kuku" ? "swiss" : "kuku");
   liveState.manualOverride = true;
+  if (liveDetector) {
+    liveDetector.setState(next === "swiss" ? "ad" : "show");
+  }
   crossfadeTo(next);
 }
 
@@ -748,9 +842,8 @@ function updateLiveMediaSession() {
   }
 }
 
-// Kontrolli reklaamiaja olekuüleminekuid (iga 1s):
-// Üleminekul (reklaam algab/lõpeb) lülitatakse voog automaatselt,
-// aga vahepealne kasutaja käsitsi valik jäetakse püsima (ei lülitata vägisi tagasi).
+// Turvavõrgu kontroll: kui akustiline kõllituvastaja mingil põhjusel ei käivitunud
+// (nt brauseri piirangud helitöötlusele), tagab varuajakava lülitumise.
 setInterval(() => {
   if (!liveState.playing || liveState.fading) return;
   const isAd = isKukuAdTime();

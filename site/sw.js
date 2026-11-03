@@ -1,4 +1,4 @@
-const CACHE_NAME = "kuku-v6";
+const CACHE_NAME = "kuku-v7";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,8 +9,10 @@ const ASSETS = [
   "./icon-512.png",
   "./apple-touch-icon.png",
   "./manifest.webmanifest",
+  "./data/jingles.json",
   "./lib/crypto.js",
   "./lib/github.js",
+  "./lib/live_detector.js",
   "./lib/live_schedule.js",
   "./lib/progress.js",
   "./lib/search.js",

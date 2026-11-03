@@ -34,8 +34,10 @@ test("app.js sisaldab värskendamise ikooni ja uut Kuku logo märki", () => {
 
 test("sw.js kasutab uut puhvriversiooni ja sisaldab live_schedule.js", () => {
   const swJs = fs.readFileSync(path.join(SITE_DIR, "sw.js"), "utf-8");
-  assert.ok(swJs.includes('"kuku-v6"'), "sw.js peab kasutama CACHE_NAME kuku-v6");
+  assert.ok(swJs.includes('"kuku-v7"'), "sw.js peab kasutama CACHE_NAME kuku-v7");
   assert.ok(swJs.includes("live_schedule.js"), "sw.js ASSETS peab sisaldama live_schedule.js");
+  assert.ok(swJs.includes("live_detector.js"), "sw.js ASSETS peab sisaldama live_detector.js");
+  assert.ok(swJs.includes("jingles.json"), "sw.js ASSETS peab sisaldama jingles.json");
 });
 
 test("index.html ja manifest.webmanifest kasutavad vahemälu versiooniparameetreid", () => {

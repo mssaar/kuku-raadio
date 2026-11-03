@@ -85,3 +85,10 @@ test("app.js initsialiseerub korrektselt (store on defineeritud enne liveState k
   assert.ok(liveStatePos !== -1, "liveState peab olema defineeritud");
   assert.ok(storePos < liveStatePos, "store peab olema defineeritud ENNE liveState objekti (et vältida TDZ ReferenceError)");
 });
+
+test("app.js integreerib reaalajas helivoo akustilise kõllituvastaja LiveAudioDetector", () => {
+  const appJs = fs.readFileSync(path.join(SITE_DIR, "app.js"), "utf-8");
+  assert.ok(appJs.includes("LiveAudioDetector"), "app.js peab importima LiveAudioDetectori");
+  assert.ok(appJs.includes("createMediaElementSource"), "app.js peab ühendama Kuku helivoo Web Audio API-ga");
+  assert.ok(appJs.includes("jingles.json"), "app.js peab initsialiseerima kõllide profiilid (jingles.json)");
+});
