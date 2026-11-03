@@ -84,3 +84,25 @@ test("LiveAudioDetector tuvastab voost alguskõlli ja lõpukõlli", async () => 
   assert.equal(adEnded, true, "Lõpukõll pidi käivitama onAdEnd");
   assert.equal(detector.state, "show", "Olek pidi naasma saate peale");
 });
+
+test("LiveAudioDetector lülitub 3.5 minuti möödumisel automaatselt tagasi saate peale (turvatagastus)", async () => {
+  let adEndedReason = null;
+  const detector = new LiveAudioDetector({
+    onAdEnd: ({ fallback }) => { adEndedReason = fallback ? "safetyTimeout" : "jingle"; },
+  });
+  await detector.init(JINGLES_PATH);
+
+  // Käivitame reklaamiolekus
+  detector.setState("ad");
+  assert.equal(detector.state, "ad");
+
+  // Simuleerime, et reklaam algas 3.6 minutit tagasi
+  detector.adStartTime = Date.now() - (216 * 1000);
+
+  // Saadame veidi suvalist heli
+  const chunk = new Float32Array(4096);
+  detector.processAudio(chunk, 44100);
+
+  assert.equal(adEndedReason, "safetyTimeout", "Pärast 3.5 min peab toimuma turvatagastus tagasi Kukule");
+  assert.equal(detector.state, "show", "Olek peab olema taastatud show peale");
+});

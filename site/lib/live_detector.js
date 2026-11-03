@@ -157,6 +157,17 @@ export class LiveAudioDetector {
     this.adStartTime = 0;
   }
 
+  checkSafetyTimeout(now = Date.now()) {
+    if (this.state === "ad" && this.adStartTime > 0 && now - this.adStartTime > this.safetyTimeoutMs) {
+      this.state = "show";
+      this.adStartTime = 0;
+      this.cooldownUntil = now + 5000;
+      this.onAdEnd({ fallback: true });
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Võtab vastu toored PCM float32 helinäidised Web Audio API-st (nt 44.1kHz või 48kHz).
    * @param {Float32Array} inputSamples 
@@ -164,6 +175,9 @@ export class LiveAudioDetector {
    */
   processAudio(inputSamples, inputSampleRate = 44100) {
     if (!this.templates) return;
+
+    const now = Date.now();
+    if (this.checkSafetyTimeout(now)) return;
 
     // 1. Faasitäpne alladiskreetimine 2000 Hz peale lineaarse interpolatsiooniga
     const ratio = inputSampleRate / TARGET_SAMPLE_RATE;
@@ -188,21 +202,11 @@ export class LiveAudioDetector {
     }
     this.lastCheckSample = this.totalSamplesReceived;
 
-    const now = Date.now();
     if (now < this.cooldownUntil) {
       return;
     }
 
-    // 3. Reklaamiolekus kontrollime turvataimerit
-    if (this.state === "ad" && this.adStartTime > 0 && now - this.adStartTime > this.safetyTimeoutMs) {
-      this.state = "show";
-      this.adStartTime = 0;
-      this.cooldownUntil = now + 5000;
-      this.onAdEnd({ fallback: true });
-      return;
-    }
-
-    // 4. Kõllituvastus vastavalt olekule
+    // 3. Kõllituvastus vastavalt olekule
     if (this.state === "show") {
       // Saate ajal kuulame reklaami alguskõlli
       const score = checkCorrelation(this.ringBuffer, this.ringIndex, this.templates.start, 1000, 4);

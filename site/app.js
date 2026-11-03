@@ -3,7 +3,7 @@ import { saveSession, loadSession, clearSession } from "./lib/session.js";
 import { searchShows } from "./lib/search.js";
 import { getFile, putFile } from "./lib/github.js";
 import { savePosition, loadPosition, isFinished, progressFraction, lastInProgress } from "./lib/progress.js";
-import { isKukuAdTime, KUKU_STREAM_URL, SWISS_POP_STREAM_URL } from "./lib/live_schedule.js";
+import { KUKU_STREAM_URL, SWISS_POP_STREAM_URL } from "./lib/live_schedule.js";
 import { LiveAudioDetector } from "./lib/live_detector.js";
 import { CODE_UPDATED_AT, APP_VERSION } from "./lib/version.js";
 
@@ -60,14 +60,16 @@ const store = (() => {
   catch { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; }
 })();
 
+const LIVE_AD_SAFETY_TIMEOUT_MS = 210 * 1000; // 3.5 minutit max reklaamipaus ilma lõpukõllita
+
 const liveState = {
   playing: false,
   activeSource: "kuku", // "kuku" | "swiss"
   autoReplace: store.getItem("kuku.autoreplace") !== "false",
   fading: false,
   manualOverride: false,
+  adStartedAt: 0,
 };
-let lastLiveAdState = false;
 
 /* ---------------- helpers ---------------- */
 
@@ -679,6 +681,7 @@ function renderSettings() {
 let liveDetector = null;
 let audioCtx = null;
 let kukuSource = null;
+let kukuGain = null;
 let audioProcessor = null;
 
 async function getLiveDetector() {
@@ -691,7 +694,7 @@ async function getLiveDetector() {
       }
     },
     onAdEnd: ({ score, jingle, fallback }) => {
-      console.log(`Kuku reklaami lõpukõll tuvastatud (${fallback ? "turvaaeg" : jingle}) -> tagasi Kukule`);
+      console.log(`Kuku reklaami lõpukõll tuvastatud (${fallback ? "turvaaeg 3.5 min" : jingle}) -> tagasi Kukule`);
       if (liveState.playing && !liveState.manualOverride) {
         crossfadeTo("kuku");
       }
@@ -711,6 +714,9 @@ function initLiveWebAudio() {
     if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
 
     kukuSource = audioCtx.createMediaElementSource(liveKuku);
+    kukuGain = audioCtx.createGain();
+    kukuGain.gain.setValueAtTime(liveState.activeSource === "kuku" ? 1 : 0, audioCtx.currentTime);
+
     audioProcessor = audioCtx.createScriptProcessor(4096, 1, 1);
     audioProcessor.onaudioprocess = ev => {
       if (liveDetector && liveState.playing) {
@@ -719,15 +725,18 @@ function initLiveWebAudio() {
       }
     };
 
+    // 1. Kuku helivoog läheb otse audioProcessorisse kõllituvastuseks (saab alati heli):
     kukuSource.connect(audioProcessor);
-    kukuSource.connect(audioCtx.destination);
-
     const muteNode = audioCtx.createGain();
     muteNode.gain.value = 0;
     audioProcessor.connect(muteNode);
     muteNode.connect(audioCtx.destination);
+
+    // 2. Kuku helivoog läheb kõlaritesse läbi kukuGain sõlme (reguleeritav kuulaja jaoks):
+    kukuSource.connect(kukuGain);
+    kukuGain.connect(audioCtx.destination);
   } catch (err) {
-    console.warn("Web Audio API kõllituvastuse ühendamine ebaõnnestus (kasutan varuajakava):", err);
+    console.warn("Web Audio API kõllituvastuse ühendamine ebaõnnestus:", err);
   }
 }
 
@@ -736,30 +745,24 @@ function playLive() {
     audio.pause();
     syncPlayButtons();
   }
-  const isAd = isKukuAdTime();
-  lastLiveAdState = isAd;
   liveState.manualOverride = false;
-  const target = (isAd && liveState.autoReplace) ? "swiss" : "kuku";
-  liveState.activeSource = target;
+  liveState.activeSource = "kuku";
+  liveState.adStartedAt = 0;
   liveState.playing = true;
 
-  // Alati käivitame Kuku striimi, et helivoo kõllituvastaja saaks taustal kuulata
+  // Alati alustame Kuku otse-eetri kuulamisega
   liveKuku.src = LIVE_KUKU_URL;
-  if (target === "kuku") {
-    try { liveSwiss.pause(); liveSwiss.src = ""; } catch {}
-    liveKuku.volume = 1;
-    liveKuku.play().catch(() => {});
-  } else {
-    liveKuku.volume = 0; // Kuku mängib vaikselt taustal kõllide kuulamiseks
-    liveKuku.play().catch(() => {});
-    liveSwiss.src = LIVE_SWISS_URL;
-    liveSwiss.volume = 1;
-    liveSwiss.play().catch(() => {});
-  }
+  liveKuku.volume = 1;
+  liveKuku.play().catch(() => {});
+  try { liveSwiss.pause(); liveSwiss.src = ""; } catch {}
 
   initLiveWebAudio();
+  if (kukuGain && audioCtx) {
+    try { kukuGain.gain.setValueAtTime(1, audioCtx.currentTime); } catch {}
+  }
+
   getLiveDetector().then(det => {
-    if (det) det.setState(target === "swiss" ? "ad" : "show");
+    if (det) det.setState("show");
   }).catch(() => {});
 
   updateLiveUI();
@@ -771,7 +774,11 @@ function pauseLive() {
   liveState.playing = false;
   liveState.fading = false;
   liveState.manualOverride = false;
+  liveState.adStartedAt = 0;
   if (liveDetector) liveDetector.reset();
+  if (kukuGain && audioCtx) {
+    try { kukuGain.gain.setValueAtTime(0, audioCtx.currentTime); } catch {}
+  }
   try {
     liveKuku.pause();
     liveKuku.src = "";
@@ -795,6 +802,7 @@ function crossfadeTo(newSource) {
   liveState.fading = true;
 
   if (newSource === "swiss") {
+    liveState.adStartedAt = Date.now();
     if (liveDetector) liveDetector.setState("ad");
     liveSwiss.src = LIVE_SWISS_URL;
     liveSwiss.volume = 0;
@@ -807,11 +815,20 @@ function crossfadeTo(newSource) {
       const ratio = step / steps;
       try {
         liveSwiss.volume = Math.min(1, Math.max(0, ratio));
-        liveKuku.volume = Math.min(1, Math.max(0, 1 - ratio));
+        if (kukuGain && audioCtx) {
+          kukuGain.gain.setValueAtTime(Math.min(1, Math.max(0, 1 - ratio)), audioCtx.currentTime);
+        } else {
+          liveKuku.volume = Math.min(1, Math.max(0, 1 - ratio));
+        }
       } catch {}
       if (step >= steps) {
         clearInterval(interval);
-        liveKuku.volume = 0; // Jääb taustal mängima, et kõllituvastaja kuuleks lõpukõlli!
+        if (kukuGain && audioCtx) {
+          kukuGain.gain.setValueAtTime(0, audioCtx.currentTime);
+          liveKuku.volume = 1; // Kuku jääb vol 1 mängima, et kõllituvastaja taustal kuuleks!
+        } else {
+          liveKuku.volume = 0;
+        }
         liveSwiss.volume = 1;
         liveState.activeSource = "swiss";
         liveState.fading = false;
@@ -822,6 +839,7 @@ function crossfadeTo(newSource) {
     }, 50);
   } else {
     // newSource === "kuku"
+    liveState.adStartedAt = 0;
     if (liveDetector) liveDetector.setState("show");
     if (!liveKuku.src || liveKuku.paused) {
       liveKuku.src = LIVE_KUKU_URL;
@@ -834,8 +852,12 @@ function crossfadeTo(newSource) {
       step++;
       const ratio = step / steps;
       try {
-        liveKuku.volume = Math.min(1, Math.max(0, ratio));
         liveSwiss.volume = Math.min(1, Math.max(0, 1 - ratio));
+        if (kukuGain && audioCtx) {
+          kukuGain.gain.setValueAtTime(Math.min(1, Math.max(0, ratio)), audioCtx.currentTime);
+        } else {
+          liveKuku.volume = Math.min(1, Math.max(0, ratio));
+        }
       } catch {}
       if (step >= steps) {
         clearInterval(interval);
@@ -843,6 +865,9 @@ function crossfadeTo(newSource) {
           liveSwiss.pause();
           liveSwiss.src = "";
         } catch {}
+        if (kukuGain && audioCtx) {
+          kukuGain.gain.setValueAtTime(1, audioCtx.currentTime);
+        }
         liveKuku.volume = 1;
         liveState.activeSource = "kuku";
         liveState.fading = false;
@@ -883,22 +908,17 @@ function updateLiveMediaSession() {
   }
 }
 
-// Turvavõrgu kontroll: kui akustiline kõllituvastaja mingil põhjusel ei käivitunud
-// (nt brauseri piirangud helitöötlusele), tagab varuajakava lülitumise.
+// Turvakontroll: kui muusika on mänginud 3.5 minutit ja lõpukõlli pole kuuldud,
+// lülitume automaatselt tagasi Kuku peale (turvatagastus).
+// Enam EI tehta kellaajapõhist sundlülitust muusikale — muusikale lülitutakse
+// AINULT siis, kui helivoos kõlas Kuku reklaami alguskõll!
 setInterval(() => {
   if (!liveState.playing || liveState.fading) return;
-  const isAd = isKukuAdTime();
-  if (isAd !== lastLiveAdState) {
-    lastLiveAdState = isAd;
-    liveState.manualOverride = false;
-    if (isAd) {
-      if (liveState.autoReplace && liveState.activeSource === "kuku") {
-        crossfadeTo("swiss");
-      }
-    } else {
-      if (liveState.activeSource === "swiss") {
-        crossfadeTo("kuku");
-      }
+  if (liveState.activeSource === "swiss" && liveState.adStartedAt > 0) {
+    const elapsed = Date.now() - liveState.adStartedAt;
+    if (elapsed >= LIVE_AD_SAFETY_TIMEOUT_MS) {
+      console.log("3.5 minutit möödas reklaami algusest ilma lõpukõllita -> turvatagastus Kukule");
+      crossfadeTo("kuku");
     }
   }
 }, 1000);
@@ -1001,13 +1021,8 @@ function bindLiveEvents() {
       liveState.autoReplace = ev.target.checked;
       store.setItem("kuku.autoreplace", liveState.autoReplace ? "true" : "false");
       liveState.manualOverride = false;
-      if (liveState.playing) {
-        const isAd = isKukuAdTime();
-        if (liveState.autoReplace && isAd && liveState.activeSource === "kuku") {
-          crossfadeTo("swiss");
-        } else if (!liveState.autoReplace && liveState.activeSource === "swiss") {
-          crossfadeTo("kuku");
-        }
+      if (liveState.playing && !liveState.autoReplace && liveState.activeSource === "swiss") {
+        crossfadeTo("kuku");
       }
     };
   }
