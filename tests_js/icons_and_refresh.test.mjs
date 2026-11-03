@@ -51,3 +51,17 @@ test("index.html ja manifest.webmanifest kasutavad vahemälu versiooniparameetre
   assert.ok(manifest.id && manifest.id.includes("v="), "manifest peab omama id välja versiooniga");
   assert.ok(manifest.icons.some(i => i.src.includes("icon-192.png?v=")), "icon-192.png peab omama versioonitunnust");
 });
+
+test("versiooniinfo ja koodi viimase muutmise aeg on seadistatud", () => {
+  const versionJsPath = path.join(SITE_DIR, "lib", "version.js");
+  assert.ok(fs.existsSync(versionJsPath), "site/lib/version.js peab eksisteerima");
+  const versionJs = fs.readFileSync(versionJsPath, "utf-8");
+  assert.ok(versionJs.includes("CODE_UPDATED_AT"), "CODE_UPDATED_AT peab olema defineeritud");
+  assert.ok(versionJs.includes("APP_VERSION"), "APP_VERSION peab olema defineeritud");
+
+  const appJs = fs.readFileSync(path.join(SITE_DIR, "app.js"), "utf-8");
+  assert.ok(appJs.includes('from "./lib/version.js"'), "app.js peab importima version.js");
+  assert.ok(!appJs.includes('id="checked-info"'), "Esilehelt peab olema eemaldatud checked-info nupp");
+  assert.ok(appJs.includes('id="code-updated-at"'), "Seadete lehel peab olema koodi uuenduse kuupäev");
+  assert.ok(appJs.includes('id="app-version"'), "Seadete lehel peab olema versiooniinfo");
+});
