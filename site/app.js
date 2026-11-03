@@ -403,7 +403,6 @@ function renderHome() {
         </div>`}
     </section>`;
   $("refresh")?.addEventListener("click", () => refreshData(true));
-  $("checked-info")?.addEventListener("click", () => refreshData(true));
   $("logout").addEventListener("click", () => signOut());
   syncPlayButtons();
 }
