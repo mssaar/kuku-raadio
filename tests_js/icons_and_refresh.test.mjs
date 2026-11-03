@@ -38,6 +38,7 @@ test("sw.js kasutab uut puhvriversiooni ja sisaldab live_schedule.js", () => {
   assert.ok(swJs.includes("live_schedule.js"), "sw.js ASSETS peab sisaldama live_schedule.js");
   assert.ok(swJs.includes("live_detector.js"), "sw.js ASSETS peab sisaldama live_detector.js");
   assert.ok(swJs.includes("jingles.json"), "sw.js ASSETS peab sisaldama jingles.json");
+  assert.ok(swJs.includes("version.js"), "sw.js ASSETS peab sisaldama version.js");
 });
 
 test("index.html ja manifest.webmanifest kasutavad vahemälu versiooniparameetreid", () => {
