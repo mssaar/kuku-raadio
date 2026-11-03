@@ -5,6 +5,7 @@ import { getFile, putFile } from "./lib/github.js";
 import { savePosition, loadPosition, isFinished, progressFraction, lastInProgress } from "./lib/progress.js";
 import { isKukuAdTime, KUKU_STREAM_URL, SWISS_POP_STREAM_URL } from "./lib/live_schedule.js";
 import { LiveAudioDetector } from "./lib/live_detector.js";
+import { CODE_UPDATED_AT, APP_VERSION } from "./lib/version.js";
 
 const SHOWS_PATH = "site/data/shows.json";
 const AUTH_PATH = "site/data/auth.json";
@@ -168,11 +169,6 @@ async function refreshData(rerender = true) {
       const sheetOpen = !$("sheet").hidden;
       if (!hash.startsWith("#/seaded") && !inSearchInput && !sheetOpen) {
         route();
-      } else {
-        const checkedEl = $("checked-info");
-        if (checkedEl && state.status?.checked_at) {
-          checkedEl.textContent = `Viimati kontrollitud ${timeFmt.format(new Date(state.status.checked_at))}`;
-        }
       }
     }
   } catch (err) {
@@ -369,11 +365,10 @@ function renderHome() {
     label = "Uusim osa";
   }
   const shows = [...state.shows].sort((a, b) => a.name.localeCompare(b.name, "et"));
-  const checked = state.status?.checked_at ? `Viimati kontrollitud ${timeFmt.format(new Date(state.status.checked_at))}` : "";
 
   view.innerHTML = `
     <header class="topbar">
-      <div><h1>${greeting()}</h1>${checked ? `<button class="checked checked-btn" id="checked-info" title="Klõpsa andmete värskendamiseks">${checked}</button>` : ""}</div>
+      <div><h1>${greeting()}</h1></div>
       <div class="topbar__actions">
         <button class="icon-btn" id="refresh" aria-label="Värskenda saateid" title="Värskenda saateid">${ICONS.refresh}</button>
         <a class="icon-btn" href="#/seaded" aria-label="Seaded ja paigaldus" title="Seaded ja paigaldus">${ICONS.gear}</a>
