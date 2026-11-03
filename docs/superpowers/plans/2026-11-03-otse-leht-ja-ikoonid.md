@@ -35,17 +35,17 @@
 - Modify: `site/sw.js`
 - Test: `tests_js/icons_and_refresh.test.mjs`
 
-- [ ] **Step 1: Kirjuta test, mis kontrollib versioonitunnuseid manifestis ja index.html-s**
+- [x] **Step 1: Kirjuta test, mis kontrollib versioonitunnuseid manifestis ja index.html-s**
   Lisa faili `tests_js/icons_and_refresh.test.mjs` kontroll, et `manifest.webmanifest`, `icon.svg` ja `apple-touch-icon.png` omavad versiooniparameetreid ning manifestis on unikaalne `id`.
-- [ ] **Step 2: Käivita test ja veendu läbikukkumises**
+- [x] **Step 2: Käivita test ja veendu läbikukkumises**
   Run: `npm test`
-- [ ] **Step 3: Uuenda `site/manifest.webmanifest`**
+- [x] **Step 3: Uuenda `site/manifest.webmanifest`**
   Määra `"id": "/?v=4"`, ikoonide teed `"icon-192.png?v=4"` ja `"icon-512.png?v=4"`.
-- [ ] **Step 4: Uuenda `site/index.html`**
+- [x] **Step 4: Uuenda `site/index.html`**
   Lisa `icon.svg?v=4`, `apple-touch-icon.png?v=4`, `manifest.webmanifest?v=4`.
-- [ ] **Step 5: Uuenda `site/sw.js`**
+- [x] **Step 5: Uuenda `site/sw.js`**
   Tõsta `CACHE_NAME = "kuku-v4"`.
-- [ ] **Step 6: Käivita testid ja veendu õnnestumises**
+- [x] **Step 6: Käivita testid ja veendu õnnestumises**
   Run: `npm test`
 
 ---
@@ -58,20 +58,20 @@
 - Modify: `site/style.css`
 - Test: `tests_js/otse.test.mjs`
 
-- [ ] **Step 1: Kirjuta test alamlehe `#/otse` ja menüünupu kohta**
+- [x] **Step 1: Kirjuta test alamlehe `#/otse` ja menüünupu kohta**
   Loo `tests_js/otse.test.mjs` ja lisa test, mis kontrollib, et `#tabs` sisaldab saki `#/otse` ning `app.js` renderdab otse-eetri vaate.
-- [ ] **Step 2: Käivita test ja veendu läbikukkumises**
+- [x] **Step 2: Käivita test ja veendu läbikukkumises**
   Run: `npm test`
-- [ ] **Step 3: Lisa menüünupp faili `site/index.html`**
+- [x] **Step 3: Lisa menüünupp faili `site/index.html`**
   Lisa `#tabs` navigatsiooni:
   ```html
   <a href="#/otse" data-tab="live"><span class="tabs__icon" data-icon="live"></span>Otse</a>
   ```
-- [ ] **Step 4: Lisa `ICONS.live` ja marsruut `#/otse` faili `site/app.js`**
+- [x] **Step 4: Lisa `ICONS.live` ja marsruut `#/otse` faili `site/app.js`**
   Lisa `ICONS.live` raadiomasti/eetri ikoonina, lisa ruuting `#/otse` funktsiooni `route()` ning loo esialgne `renderLive(view)` funktsioon.
-- [ ] **Step 5: Lisa stiilid faili `site/style.css`**
+- [x] **Step 5: Lisa stiilid faili `site/style.css`**
   Stiili `.live-view`, `.live-badge`, `.live-card`, `.live-indicator`, `.live-source`, `.live-btn`.
-- [ ] **Step 6: Käivita testid ja veendu õnnestumises**
+- [x] **Step 6: Käivita testid ja veendu õnnestumises**
   Run: `npm test`
 
 ---
@@ -83,21 +83,21 @@
 - Modify: `site/style.css`
 - Test: `tests_js/otse.test.mjs`
 
-- [ ] **Step 1: Kirjuta test helimootori ja asendusloogika kohta**
+- [x] **Step 1: Kirjuta test helimootori ja asendusloogika kohta**
   Lisa faili `tests_js/otse.test.mjs` testid, mis kontrollivad:
   - Otse-eetri striimi URL-i (`https://router.euddn.net/8103046e16b71d15d692b57c187875c7/kuku.mp3`)
   - Radio Swiss Pop striimi URL-i (`https://stream.srg-ssr.ch/m/rsp/mp3_128`)
   - Lülitamist ja staatuse muutumist.
-- [ ] **Step 2: Käivita test ja veendu läbikukkumises**
+- [x] **Step 2: Käivita test ja veendu läbikukkumises**
   Run: `npm test`
-- [ ] **Step 3: Implementeeri `LiveAudioEngine` klass või moodul failis `site/app.js`**
+- [x] **Step 3: Implementeeri `LiveAudioEngine` klass või moodul failis `site/app.js`**
   - Haldab kahte audio voogu: Kuku ja Radio Swiss Pop.
   - Implementeeri pehme helitugevuse *crossfade* (0.5s) voogude vahel.
   - Lisa ajapõhised automaatsed aknad Kuku tüüpilisteks reklaamipausideks (minutid 19:30–22:00, 33:00–35:30, 45:30–48:00, 58:00–03:00).
   - Lisa käsitsi lüliti nupp ekraanile: "Hüppa muusikale" / "Tagasi Kuku peale".
   - Seadistus: võimalus automaatne muusikaasendus sisse/välja lülitada (salvestub `localStorage`-isse).
   - Kui otse-eeter käivitub, peatatakse järelkuulamise pleier ja vastupidi.
-- [ ] **Step 4: Käivita testid ja veendu õnnestumises**
+- [x] **Step 4: Käivita testid ja veendu õnnestumises**
   Run: `npm test`
 
 ---
@@ -108,9 +108,9 @@
 - Test: `tests_js/*.test.mjs`
 - Test: Python testid `tests/`
 
-- [ ] **Step 1: Käivita kõik JavaScripti testid**
+- [x] **Step 1: Käivita kõik JavaScripti testid**
   Run: `npm test`
-- [ ] **Step 2: Käivita kõik Pythoni testid**
+- [x] **Step 2: Käivita kõik Pythoni testid**
   Run: `python -m pytest`
-- [ ] **Step 3: Kontrolli `git status` ja puhtust**
+- [x] **Step 3: Kontrolli `git status` ja puhtust**
   Veendu, et kõik failid on puhtad ja reeglid (AGENTS.md, kasutaja käsitsi muudatuste kaitse) täidetud.
