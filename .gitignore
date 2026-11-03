@@ -8,4 +8,8 @@ __pycache__/
 .impeccable/build/
 .impeccable/questions/
 .env
+*.mp3
+*.wav
+!kuku/assets/*.mp3
+!kuku/assets/*.wav
 

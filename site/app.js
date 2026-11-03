@@ -63,7 +63,9 @@ const liveState = {
   activeSource: "kuku", // "kuku" | "swiss"
   autoReplace: store.getItem("kuku.autoreplace") !== "false",
   fading: false,
+  manualOverride: false,
 };
+let lastLiveAdState = false;
 
 /* ---------------- helpers ---------------- */
 
@@ -638,6 +640,8 @@ function playLive() {
     syncPlayButtons();
   }
   const isAd = isKukuAdTime();
+  lastLiveAdState = isAd;
+  liveState.manualOverride = false;
   const target = (isAd && liveState.autoReplace) ? "swiss" : "kuku";
   liveState.activeSource = target;
   liveState.playing = true;
@@ -662,6 +666,7 @@ function playLive() {
 function pauseLive() {
   liveState.playing = false;
   liveState.fading = false;
+  liveState.manualOverride = false;
   try {
     liveKuku.pause();
     liveKuku.src = "";
@@ -720,6 +725,7 @@ function crossfadeTo(newSource) {
 function switchLiveSource(target) {
   if (!liveState.playing) return;
   const next = target || (liveState.activeSource === "kuku" ? "swiss" : "kuku");
+  liveState.manualOverride = true;
   crossfadeTo(next);
 }
 
@@ -742,16 +748,26 @@ function updateLiveMediaSession() {
   }
 }
 
-// Kontrolli iga 2 sekundi järel reklaamiaega:
+// Kontrolli reklaamiaja olekuüleminekuid (iga 1s):
+// Üleminekul (reklaam algab/lõpeb) lülitatakse voog automaatselt,
+// aga vahepealne kasutaja käsitsi valik jäetakse püsima (ei lülitata vägisi tagasi).
 setInterval(() => {
-  if (!liveState.playing || !liveState.autoReplace || liveState.fading) return;
+  if (!liveState.playing || liveState.fading) return;
   const isAd = isKukuAdTime();
-  if (isAd && liveState.activeSource === "kuku") {
-    crossfadeTo("swiss");
-  } else if (!isAd && liveState.activeSource === "swiss") {
-    crossfadeTo("kuku");
+  if (isAd !== lastLiveAdState) {
+    lastLiveAdState = isAd;
+    liveState.manualOverride = false;
+    if (isAd) {
+      if (liveState.autoReplace && liveState.activeSource === "kuku") {
+        crossfadeTo("swiss");
+      }
+    } else {
+      if (liveState.activeSource === "swiss") {
+        crossfadeTo("kuku");
+      }
+    }
   }
-}, 2000);
+}, 1000);
 
 function renderLive() {
   setChrome(true);
@@ -850,6 +866,7 @@ function bindLiveEvents() {
     toggleAuto.onchange = ev => {
       liveState.autoReplace = ev.target.checked;
       store.setItem("kuku.autoreplace", liveState.autoReplace ? "true" : "false");
+      liveState.manualOverride = false;
       if (liveState.playing) {
         const isAd = isKukuAdTime();
         if (liveState.autoReplace && isAd && liveState.activeSource === "kuku") {
