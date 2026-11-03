@@ -7,9 +7,9 @@
   <meta name="color-scheme" content="dark">
   <meta name="robots" content="noindex">
   <title>Kuku arhiiv</title>
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" href="icon.svg?v=4" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest?v=4">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=4">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -38,6 +38,7 @@
 
   <nav id="tabs" class="tabs" hidden aria-label="Peamenüü">
     <a href="#/" data-tab="home"><span class="tabs__icon" data-icon="home"></span>Kodu</a>
+    <a href="#/otse" data-tab="live"><span class="tabs__icon" data-icon="live"></span>Otse</a>
     <a href="#/otsi" data-tab="search"><span class="tabs__icon" data-icon="search"></span>Otsi</a>
   </nav>
 
@@ -66,5 +67,7 @@
   </section>
 
   <audio id="audio" preload="none"></audio>
+  <audio id="live-kuku" preload="none"></audio>
+  <audio id="live-swiss" preload="none"></audio>
 </body>
 </html>

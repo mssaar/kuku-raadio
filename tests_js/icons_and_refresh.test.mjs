@@ -32,7 +32,18 @@ test("app.js sisaldab värskendamise ikooni ja uut Kuku logo märki", () => {
   assert.ok(appJs.includes("refreshData"), "refreshData funktsioon peab olema defineeritud");
 });
 
-test("sw.js kasutab uut puhvriversiooni kuku-v3", () => {
+test("sw.js kasutab uut puhvriversiooni kuku-v4", () => {
   const swJs = fs.readFileSync(path.join(SITE_DIR, "sw.js"), "utf-8");
-  assert.ok(swJs.includes('"kuku-v3"'), "sw.js peab kasutama CACHE_NAME kuku-v3");
+  assert.ok(swJs.includes('"kuku-v4"'), "sw.js peab kasutama CACHE_NAME kuku-v4");
+});
+
+test("index.html ja manifest.webmanifest kasutavad vahemälu versiooniparameetreid", () => {
+  const indexHtml = fs.readFileSync(path.join(SITE_DIR, "index.html"), "utf-8");
+  assert.ok(indexHtml.includes('manifest.webmanifest?v='), "manifest.webmanifest peab omama versioonitunnust");
+  assert.ok(indexHtml.includes('apple-touch-icon.png?v='), "apple-touch-icon.png peab omama versioonitunnust");
+  assert.ok(indexHtml.includes('icon.svg?v='), "icon.svg peab omama versioonitunnust");
+
+  const manifest = JSON.parse(fs.readFileSync(path.join(SITE_DIR, "manifest.webmanifest"), "utf-8"));
+  assert.ok(manifest.id && manifest.id.includes("v="), "manifest peab omama id välja versiooniga");
+  assert.ok(manifest.icons.some(i => i.src.includes("icon-192.png?v=")), "icon-192.png peab omama versioonitunnust");
 });
