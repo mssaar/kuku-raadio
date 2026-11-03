@@ -1,4 +1,4 @@
-const CACHE_NAME = "kuku-v4";
+const CACHE_NAME = "kuku-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const ASSETS = [
   "./manifest.webmanifest",
   "./lib/crypto.js",
   "./lib/github.js",
+  "./lib/live_schedule.js",
   "./lib/progress.js",
   "./lib/search.js",
   "./lib/session.js"

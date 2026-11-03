@@ -53,16 +53,17 @@ const liveSwiss = $("live-swiss");
 const LIVE_KUKU_URL = KUKU_STREAM_URL;
 const LIVE_SWISS_URL = SWISS_POP_STREAM_URL;
 
+const store = (() => {
+  try { localStorage.setItem("kuku.t", "1"); localStorage.removeItem("kuku.t"); return localStorage; }
+  catch { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; }
+})();
+
 const liveState = {
   playing: false,
   activeSource: "kuku", // "kuku" | "swiss"
   autoReplace: store.getItem("kuku.autoreplace") !== "false",
   fading: false,
 };
-const store = (() => {
-  try { localStorage.setItem("kuku.t", "1"); localStorage.removeItem("kuku.t"); return localStorage; }
-  catch { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; }
-})();
 
 /* ---------------- helpers ---------------- */
 

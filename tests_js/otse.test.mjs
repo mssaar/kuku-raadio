@@ -58,3 +58,12 @@ test("app.js sisaldab Kuku ja Radio Swiss Pop striimide aadresse", () => {
   assert.ok(appJs.includes("router.euddn.net") && appJs.includes("kuku.mp3"), "Kuku otse-eetri striim peab olema konfigureeritud");
   assert.ok(appJs.includes("stream.srg-ssr.ch") && appJs.includes("rsp/mp3_128"), "Radio Swiss Pop asendusstriim peab olema konfigureeritud");
 });
+
+test("app.js initsialiseerub korrektselt (store on defineeritud enne liveState kasutust)", () => {
+  const appJs = fs.readFileSync(path.join(SITE_DIR, "app.js"), "utf-8");
+  const storePos = appJs.indexOf("const store =");
+  const liveStatePos = appJs.indexOf("const liveState =");
+  assert.ok(storePos !== -1, "store peab olema defineeritud");
+  assert.ok(liveStatePos !== -1, "liveState peab olema defineeritud");
+  assert.ok(storePos < liveStatePos, "store peab olema defineeritud ENNE liveState objekti (et vältida TDZ ReferenceError)");
+});

@@ -32,9 +32,10 @@ test("app.js sisaldab värskendamise ikooni ja uut Kuku logo märki", () => {
   assert.ok(appJs.includes("refreshData"), "refreshData funktsioon peab olema defineeritud");
 });
 
-test("sw.js kasutab uut puhvriversiooni kuku-v4", () => {
+test("sw.js kasutab uut puhvriversiooni ja sisaldab live_schedule.js", () => {
   const swJs = fs.readFileSync(path.join(SITE_DIR, "sw.js"), "utf-8");
-  assert.ok(swJs.includes('"kuku-v4"'), "sw.js peab kasutama CACHE_NAME kuku-v4");
+  assert.ok(swJs.includes('"kuku-v5"'), "sw.js peab kasutama CACHE_NAME kuku-v5");
+  assert.ok(swJs.includes("live_schedule.js"), "sw.js ASSETS peab sisaldama live_schedule.js");
 });
 
 test("index.html ja manifest.webmanifest kasutavad vahemälu versiooniparameetreid", () => {
