@@ -1,4 +1,4 @@
-const CACHE_NAME = "kuku-v7";
+const CACHE_NAME = "kuku-v8";
 const ASSETS = [
   "./",
   "./index.html",
@@ -16,7 +16,8 @@ const ASSETS = [
   "./lib/live_schedule.js",
   "./lib/progress.js",
   "./lib/search.js",
-  "./lib/session.js"
+  "./lib/session.js",
+  "./lib/version.js"
 ];
 
 self.addEventListener("install", event => {

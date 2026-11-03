@@ -575,6 +575,16 @@ function isStandalone() {
 function renderSettings() {
   setChrome(true);
   const installed = isStandalone();
+  const codeDate = new Date(CODE_UPDATED_AT);
+  const formattedCodeDate = isNaN(codeDate.getTime())
+    ? CODE_UPDATED_AT
+    : new Intl.DateTimeFormat("et-EE", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(codeDate);
 
   view.innerHTML = `
     <a class="back" href="#/">${ICONS.left} Tagasi</a>
@@ -611,6 +621,26 @@ function renderSettings() {
         </div>
       `}
     </section>
+
+    <section class="settings-card" style="margin-top: 16px;">
+      <h2>Rakenduse versioon ja kood</h2>
+      <div class="install-box">
+        <div class="install-step">
+          <span class="step-num">Kood viimati uuendatud</span>
+          <p id="code-updated-at"><strong>${esc(formattedCodeDate)}</strong></p>
+        </div>
+        <div class="install-step">
+          <span class="step-num">Versioon ja puhver</span>
+          <p id="app-version"><strong>${esc(APP_VERSION)}</strong></p>
+        </div>
+        <p style="color: var(--text-2); font-size: 0.8125rem; line-height: 1.4; margin-top: 4px;">
+          Kui telefon näitab vanemat kuupäeva, vajuta allolevat nuppu või sulge äpp täielikult ja ava uuesti.
+        </p>
+        <button class="pill pill--ghost install-btn" id="force-update-btn">
+          ${ICONS.refresh} Värskenda rakendust
+        </button>
+      </div>
+    </section>
   `;
 
   const btn = $("pwa-install-btn");
@@ -623,6 +653,23 @@ function renderSettings() {
         deferredInstallPrompt = null;
         renderSettings();
       }
+    });
+  }
+
+  const forceUpdateBtn = $("force-update-btn");
+  if (forceUpdateBtn) {
+    forceUpdateBtn.addEventListener("click", async () => {
+      forceUpdateBtn.disabled = true;
+      forceUpdateBtn.textContent = "Värskendan...";
+      if ("serviceWorker" in navigator) {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const reg of regs) {
+            await reg.update();
+          }
+        } catch (_) {}
+      }
+      window.location.reload();
     });
   }
 }
