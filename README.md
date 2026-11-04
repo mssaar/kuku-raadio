@@ -7,7 +7,7 @@ automaatselt ning on 6 kuud kuulatavad, telefonis või arvutis.
   Seal on reklaamid juba välja lõigatud.
 - GitHub Actions kontrollib iga 3 tunni tagant uusi osi, laeb need GitHubi *Releases*'i ja kustutab
   üle 6 kuu vanad.
-- Leht töötab GitHub Pages'is, sisselogimine käib parooliga ja brauser jääb aastaks sisse logituks.
+- Leht töötab GitHub Pages'is ja on kohe avatud ilma sisselogimiseta.
 - Pooleli jäänud osa jätkub samast kohast (iga brauser mäletab oma kohta).
 
 ## Seadistamine
@@ -18,16 +18,6 @@ Seda tehakse üks kord.
    **GitHub Actions**.
 2. **Käivita esimene uuendus.** *Actions → Kuku sync → Run workflow*. Mõne minuti pärast on leht
    aadressil `https://mssaar.github.io/kuku-raadio/`.
-3. **Loo GitHubi võti** (lubab lehel saadete nimekirja muuta):
-   1. ava <https://github.com/settings/personal-access-tokens/new>;
-   2. *Token name*: `kuku-arhiiv`, *Expiration*: 1 aasta (või *Custom*);
-   3. *Repository access*: **Only select repositories** → `kuku-raadio`;
-   4. *Permissions → Repository permissions → Contents*: **Read and write**;
-   5. *Generate token* ja kopeeri see (`github_pat_…`).
-4. **Ava leht**, kleebi võti ja vali parool (vähemalt 12 märki). Parooli võid lähedastega jagada.
-
-Võti salvestatakse repos ainult sinu parooliga krüpteerituna (`site/data/auth.json`). Kui võti
-aegub, palub leht seadistada uuesti — loo uus võti ja korda 3.–4. sammu.
 
 ## Kui Kuku midagi muudab
 
@@ -42,8 +32,7 @@ Parandus käib failis `kuku/api.py`.
 
 ## Teadmiseks
 
-- Repo ja helifailid on avalikud: parool kaitseb lehte ja saadete muutmist, aga *Releases*'i
-  failid leiab ka otse GitHubist.
+- Repo ja helifailid on avalikud: *Releases*'i failid leiab otse GitHubist.
 - Üks osa on ~110 MB. 10 iganädalast saadet × 6 kuud ≈ 29 GB (GitHub Releases'il kogumahu piirangut pole).
 
 ## Arendus

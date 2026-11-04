@@ -6,7 +6,7 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
 ## 2. Tehnoloogiad
 - **Taustaloogika ja salvestamine:** Python 3.12 (`urllib`, `pytz`, `ffmpeg` striimi salvestamiseks ja reklaamide lõikamiseks)
 - **Veebiliides (`site/`):** Staatiline HTML/CSS/vanilla JS (ES-moodulid, ilma build-sammuta), majutatud GitHub Pages'is
-- **Andmehoidla:** JSON-failid kaustas `site/data/` (`shows.json`, `library.json`, `catalog.json`, `status.json`, `auth.json`, `config.json`) ja MP3-helifailid GitHub Releases'is
+- **Andmehoidla:** JSON-failid kaustas `site/data/` (`shows.json`, `library.json`, `catalog.json`, `status.json`, `config.json`) ja MP3-helifailid GitHub Releases'is
 - **Automaatika:** GitHub Actions (`.github/workflows/sync.yml` ja `.github/workflows/record_live.yml`)
 
 ## 3. Kaustastruktuur ja peamised failid
