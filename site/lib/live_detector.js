@@ -131,7 +131,7 @@ export class LiveAudioDetector {
     this.lastCheckSample = 0;
     this.adStartTime = 0;
     this.checkIntervalSamples = TARGET_SAMPLE_RATE * 0.25; // Kontrolli iga 250ms järel
-    this.safetyTimeoutMs = 210 * 1000; // 3.5 minutit max reklaamipaus
+    this.safetyTimeoutMs = 120 * 1000; // 2 minutit max reklaamipaus
     this.cooldownUntil = 0;
   }
 

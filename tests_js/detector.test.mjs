@@ -85,24 +85,33 @@ test("LiveAudioDetector tuvastab voost alguskõlli ja lõpukõlli", async () => 
   assert.equal(detector.state, "show", "Olek pidi naasma saate peale");
 });
 
-test("LiveAudioDetector lülitub 3.5 minuti möödumisel automaatselt tagasi saate peale (turvatagastus)", async () => {
+test("LiveAudioDetector lülitub 2 minuti möödumisel automaatselt tagasi saate peale (turvatagastus)", async () => {
   let adEndedReason = null;
   const detector = new LiveAudioDetector({
     onAdEnd: ({ fallback }) => { adEndedReason = fallback ? "safetyTimeout" : "jingle"; },
   });
   await detector.init(JINGLES_PATH);
 
+  assert.equal(detector.safetyTimeoutMs, 120 * 1000, "safetyTimeoutMs peab olema 2 minutit (120s)");
+
   // Käivitame reklaamiolekus
   detector.setState("ad");
   assert.equal(detector.state, "ad");
 
-  // Simuleerime, et reklaam algas 3.6 minutit tagasi
-  detector.adStartTime = Date.now() - (216 * 1000);
+  // 1) Enne 2 minuti täitumist (nt 1.5 min ehk 90 s) ei tohi turvatagastust toimuda
+  detector.adStartTime = Date.now() - (90 * 1000);
+  const chunk1 = new Float32Array(4096);
+  detector.processAudio(chunk1, 44100);
+  assert.equal(adEndedReason, null, "Enne 2 min möödumist ei tohi turvatagastus käivituda");
+  assert.equal(detector.state, "ad", "Olek peab olema endiselt ad");
+
+  // 2) Simuleerime, et reklaam algas 2.1 minutit tagasi (üle 2 min)
+  detector.adStartTime = Date.now() - (126 * 1000);
 
   // Saadame veidi suvalist heli
-  const chunk = new Float32Array(4096);
-  detector.processAudio(chunk, 44100);
+  const chunk2 = new Float32Array(4096);
+  detector.processAudio(chunk2, 44100);
 
-  assert.equal(adEndedReason, "safetyTimeout", "Pärast 3.5 min peab toimuma turvatagastus tagasi Kukule");
+  assert.equal(adEndedReason, "safetyTimeout", "Pärast 2 min peab toimuma turvatagastus tagasi Kukule");
   assert.equal(detector.state, "show", "Olek peab olema taastatud show peale");
 });

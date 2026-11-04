@@ -63,8 +63,8 @@ test("app.js toetab käsitsi tagasi lülitamist ega sunni vägisi kella järgi m
   // Ei tohi sisaldada kellaajapõhist sundlülitust muusikale:
   assert.ok(!appJs.includes("crossfadeTo(\"swiss\")\n      }\n    } else {\n      if (liveState.activeSource === \"swiss\")"), "app.js ei tohi kellaajapõhiselt lülituda muusikale");
   assert.ok(!appJs.includes("isAd !== lastLiveAdState"), "app.js ei tohi kasutada kellaaja olekuüleminekut muusika pealesundimiseks");
-  // 3.5 min turvatagastus ja GainNode:
-  assert.ok(appJs.includes("LIVE_AD_SAFETY_TIMEOUT_MS") || appJs.includes("210000") || appJs.includes("210 * 1000"), "app.js peab sisaldama 3.5 min turvatagastust");
+  // 2 min turvatagastus ja GainNode:
+  assert.ok(appJs.includes("LIVE_AD_SAFETY_TIMEOUT_MS = 120 * 1000") || appJs.includes("120000"), "app.js peab sisaldama 2 min turvatagastust");
   assert.ok(appJs.includes("kukuGain"), "app.js peab juhtima Kuku kuulamise helitugevust kukuGain GainNode kaudu");
 });
 

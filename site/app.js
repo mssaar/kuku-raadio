@@ -56,7 +56,7 @@ const store = (() => {
   catch { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; }
 })();
 
-const LIVE_AD_SAFETY_TIMEOUT_MS = 210 * 1000; // 3.5 minutit max reklaamipaus ilma lõpukõllita
+const LIVE_AD_SAFETY_TIMEOUT_MS = 120 * 1000; // 2 minutit max reklaamipaus ilma lõpukõllita
 
 const liveState = {
   playing: false,
@@ -583,7 +583,7 @@ async function getLiveDetector() {
       }
     },
     onAdEnd: ({ score, jingle, fallback }) => {
-      console.log(`Kuku reklaami lõpukõll tuvastatud (${fallback ? "turvaaeg 3.5 min" : jingle}) -> tagasi Kukule`);
+      console.log(`Kuku reklaami lõpukõll tuvastatud (${fallback ? "turvaaeg 2 min" : jingle}) -> tagasi Kukule`);
       if (liveState.playing && !liveState.manualOverride) {
         crossfadeTo("kuku");
       }
@@ -797,7 +797,7 @@ function updateLiveMediaSession() {
   }
 }
 
-// Turvakontroll: kui muusika on mänginud 3.5 minutit ja lõpukõlli pole kuuldud,
+// Turvakontroll: kui muusika on mänginud 2 minutit ja lõpukõlli pole kuuldud,
 // lülitume automaatselt tagasi Kuku peale (turvatagastus).
 // Enam EI tehta kellaajapõhist sundlülitust muusikale — muusikale lülitutakse
 // AINULT siis, kui helivoos kõlas Kuku reklaami alguskõll!
@@ -806,7 +806,7 @@ setInterval(() => {
   if (liveState.activeSource === "swiss" && liveState.adStartedAt > 0) {
     const elapsed = Date.now() - liveState.adStartedAt;
     if (elapsed >= LIVE_AD_SAFETY_TIMEOUT_MS) {
-      console.log("3.5 minutit möödas reklaami algusest ilma lõpukõllita -> turvatagastus Kukule");
+      console.log("2 minutit möödas reklaami algusest ilma lõpukõllita -> turvatagastus Kukule");
       crossfadeTo("kuku");
     }
   }
