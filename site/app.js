@@ -185,6 +185,10 @@ function setChrome(visible) {
   updateMini();
 }
 
+function isMessengerInApp() {
+  return /FBAN|FBAV|Instagram|Messenger/i.test(navigator.userAgent);
+}
+
 function renderBanner() {
   const b = $("banner");
   const st = state.status || {};
@@ -201,6 +205,10 @@ function renderBanner() {
   } else if (st.message) {
     b.hidden = false;
     b.innerHTML = esc(st.message);
+  } else if (isMessengerInApp()) {
+    b.hidden = false;
+    b.classList.add("banner--quiet");
+    b.innerHTML = `Märkus: Messengeri siseses brauseris ei pruugi helifailid mängida. Parima kogemuse saamiseks ava leht eraldi brauseris (ülevalt menüüst <strong>•••</strong> &rarr; „Ava Safaris“ või „Ava brauseris“).`;
   } else {
     b.hidden = true;
   }
@@ -970,7 +978,9 @@ function play(id) {
       try { audio.currentTime = start; } catch {}
     }, { once: true });
   }
-  audio.play().catch(() => {});
+  audio.play().catch(() => {
+    syncPlayButtons();
+  });
   updateMini();
   updateMediaSession();
 }
@@ -1055,7 +1065,19 @@ audio.addEventListener("ended", () => {
 });
 audio.addEventListener("error", () => {
   if (!state.current) return;
-  $("mini-show").textContent = "Faili ei saanud laadida. Proovi hiljem uuesti.";
+  syncPlayButtons();
+  if (isMessengerInApp()) {
+    $("mini-show").textContent = "Messenger blokeerib heli. Ava Safaris (••• menüüst).";
+    const b = $("banner");
+    if (b) {
+      b.className = "banner";
+      b.hidden = false;
+      b.innerHTML = `<strong>Messengeri siseses brauseris ei saa helifaile mängida.</strong><br>
+        Vajuta üleval paremas nurgas menüüle <strong>•••</strong> ja vali <strong>„Ava Safaris“</strong> (või „Ava brauseris“).`;
+    }
+  } else {
+    $("mini-show").textContent = "Faili ei saanud laadida. Proovi hiljem uuesti.";
+  }
 });
 
 function seekBy(delta) {
