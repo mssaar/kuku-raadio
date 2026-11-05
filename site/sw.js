@@ -14,6 +14,7 @@ const ASSETS = [
   "./lib/live_detector.js",
   "./lib/live_schedule.js",
   "./lib/progress.js",
+  "./lib/proxy.js",
   "./lib/search.js",
   "./lib/session.js",
   "./lib/version.js"

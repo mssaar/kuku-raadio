@@ -19,6 +19,7 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
 - `kuku/assets/` — Kuku ametlikud reklaamikõllide helinäidised (`puhas_alguskoll.wav`, `puhas_lopukoll_*.wav`)
 - `kuku/record_live.py` — Otse-eetri striimi (`STREAM_URL`) salvestamise ja GitHub Releases'isse üleslaadimise CLI tööriist
 - `kuku/auto_record.py` — Automaatne otse-eetri kontrollija ja salvestaja (`python -m kuku.auto_record`)
+- `cloudflare-worker/` — Cloudflare Worker helivoo vahendaja (Audio Proxy) iOS/Safari toeks
 - `site/` — Veebirakenduse esikülg (`index.html`, `app.js`, `style.css`, `lib/`)
 - `tests/` — Pythoni üksustestid (`pytest`)
 - `tests_js/` — JavaScripti üksustestid (`node --test`)

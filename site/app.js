@@ -5,6 +5,7 @@ import { savePosition, loadPosition, isFinished, progressFraction, lastInProgres
 import { KUKU_STREAM_URL, SWISS_POP_STREAM_URL } from "./lib/live_schedule.js";
 import { LiveAudioDetector } from "./lib/live_detector.js";
 import { CODE_UPDATED_AT, APP_VERSION } from "./lib/version.js";
+import { resolveAudioUrl } from "./lib/proxy.js";
 
 const SHOWS_PATH = "site/data/shows.json";
 const SOON_DAYS = 14;
@@ -980,7 +981,7 @@ function play(id) {
   }
   if (state.current) savePosition(store, state.current.episode.id, audio.currentTime, audio.duration || state.current.episode.duration_seconds);
   state.current = found;
-  audio.src = found.episode.url;
+  audio.src = resolveAudioUrl(found.episode.url, state.audioProxy);
   const start = loadPosition(store, id);
   if (start) {
     audio.addEventListener("loadedmetadata", () => {
@@ -1079,7 +1080,7 @@ audio.addEventListener("ended", () => {
 audio.addEventListener("error", () => {
   if (!state.current) return;
   syncPlayButtons();
-  const url = state.current.episode.url;
+  const url = resolveAudioUrl(state.current.episode.url, state.audioProxy);
   if (isMessengerInApp()) {
     $("mini-show").textContent = "Messenger blokeerib heli. Ava Safaris (••• menüüst).";
     state.audioError = `<strong>Messengeri siseses brauseris ei saa helifaile mängida.</strong><br>
@@ -1245,6 +1246,7 @@ async function init() {
       fetchJson("data/library.json"), fetchJson("data/shows.json"),
     ]);
     state.repo = config?.repo || "";
+    state.audioProxy = config?.audioProxy || "";
     state.status = status || { ok: true };
     state.catalog = catalog || { shows: [] };
     state.library = library || { shows: [] };
