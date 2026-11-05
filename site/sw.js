@@ -1,4 +1,4 @@
-const CACHE_NAME = "kuku-v10";
+const CACHE_NAME = "kuku-v11";
 const ASSETS = [
   "./",
   "./index.html",

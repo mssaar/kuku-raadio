@@ -570,8 +570,14 @@ function renderSettings() {
         try {
           const regs = await navigator.serviceWorker.getRegistrations();
           for (const reg of regs) {
-            await reg.update();
+            await reg.unregister();
           }
+        } catch (_) {}
+      }
+      if (window.caches) {
+        try {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
         } catch (_) {}
       }
       window.location.reload();
@@ -1264,6 +1270,16 @@ async function init() {
     }
   }
   if ("serviceWorker" in navigator) {
+    let refreshing = false;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) return;
+      if (hadController && !state.playing && !liveState.playing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+
     navigator.serviceWorker.register("./sw.js").then(reg => {
       reg.update().catch(() => {});
     }).catch(() => {});
