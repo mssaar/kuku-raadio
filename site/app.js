@@ -191,8 +191,9 @@ function isMessengerInApp() {
 
 function renderBanner() {
   const b = $("banner");
+  if (!b) return;
   const st = state.status || {};
-  b.classList.toggle("banner--quiet", st.ok !== false);
+  b.classList.toggle("banner--quiet", st.ok !== false && !state.audioError);
   if (st.ok === false && st.kind === "error") {
     b.hidden = false;
     b.innerHTML = `<strong>Viimane uuendus ebaõnnestus. Järgmine katse on 3 tunni pärast.</strong>
@@ -205,6 +206,10 @@ function renderBanner() {
   } else if (st.message) {
     b.hidden = false;
     b.innerHTML = esc(st.message);
+  } else if (state.audioError) {
+    b.hidden = false;
+    b.className = "banner";
+    b.innerHTML = state.audioError;
   } else if (isMessengerInApp()) {
     b.hidden = false;
     b.classList.add("banner--quiet");
@@ -969,6 +974,10 @@ function play(id) {
     audio.paused ? audio.play() : audio.pause();
     return;
   }
+  if (state.audioError) {
+    state.audioError = null;
+    renderBanner();
+  }
   if (state.current) savePosition(store, state.current.episode.id, audio.currentTime, audio.duration || state.current.episode.duration_seconds);
   state.current = found;
   audio.src = found.episode.url;
@@ -1057,6 +1066,10 @@ audio.addEventListener("pause", () => {
 });
 audio.addEventListener("play", () => {
   if (liveState.playing) pauseLive();
+  if (state.audioError) {
+    state.audioError = null;
+    renderBanner();
+  }
   syncPlayButtons();
 });
 audio.addEventListener("ended", () => {
@@ -1066,18 +1079,18 @@ audio.addEventListener("ended", () => {
 audio.addEventListener("error", () => {
   if (!state.current) return;
   syncPlayButtons();
+  const url = state.current.episode.url;
   if (isMessengerInApp()) {
     $("mini-show").textContent = "Messenger blokeerib heli. Ava Safaris (••• menüüst).";
-    const b = $("banner");
-    if (b) {
-      b.className = "banner";
-      b.hidden = false;
-      b.innerHTML = `<strong>Messengeri siseses brauseris ei saa helifaile mängida.</strong><br>
-        Vajuta üleval paremas nurgas menüüle <strong>•••</strong> ja vali <strong>„Ava Safaris“</strong> (või „Ava brauseris“).`;
-    }
+    state.audioError = `<strong>Messengeri siseses brauseris ei saa helifaile mängida.</strong><br>
+      Vajuta üleval paremas nurgas menüüle <strong>•••</strong> ja vali <strong>„Ava Safaris“</strong> (või „Ava brauseris“).`;
   } else {
-    $("mini-show").textContent = "Faili ei saanud laadida. Proovi hiljem uuesti.";
+    $("mini-show").textContent = "Faili ei saanud laadida. Ava leht brauseris (Safari, Chrome).";
+    state.audioError = `<strong>Helifaili ei saanud laadida.</strong><br>
+      Kui avasid lehe mõne rakenduse seest (Messenger, Instagram, e-post jm), ava see tavalises veebibrauseris (Safari, Chrome).<br>
+      Kui oled juba tavalises brauseris, kontrolli võrguühendust, proovi hiljem uuesti või <a href="${esc(url)}" target="_blank" rel="noopener">ava fail otselingilt</a>.`;
   }
+  renderBanner();
 });
 
 function seekBy(delta) {
