@@ -118,14 +118,14 @@ def test_detect_ad_intervals_cuts_start_and_end_by_theme_intro(tmp_path, monkeyp
 
     monkeypatch.setattr("kuku.jingles.load_audio", mock_load)
 
-    # 1. show_id=231 puhul lõikab alguse 460s pealt ja lõpu 3580 + 12 = 3592s pealt
+    # 1. show_id=231 puhul lõikab alguse koos tunnus-introga (460 + 6 = 466s) ja lõpu 3580 + 12 = 3592s pealt
     intervals = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=True, show_id=231)
-    assert intervals[0] == (0, 460)
+    assert intervals[0] == (0, 466)
     assert intervals[-1] == (3592, 3600)
 
-    # 2. cut_start=False puhul algust ei lõigata (ei lisata (0, 460))
+    # 2. cut_start=False puhul algust ei lõigata (ei lisata (0, 466))
     intervals_no_cut = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=False, show_id=231)
-    assert intervals_no_cut[0] != (0, 460)
+    assert intervals_no_cut[0] != (0, 466)
     assert intervals_no_cut[-1] == (3592, 3600)
 
 

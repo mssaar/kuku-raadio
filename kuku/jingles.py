@@ -126,7 +126,7 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
                 intro_peaks = _find_peaks(norm_intro, SAMPLE_RATE, threshold=0.65, min_dist_sec=5.0)
                 if intro_peaks:
                     best_intro = max(intro_peaks, key=lambda x: x[1])
-                    start_cut_sec = int(round(180.0 + best_intro[0]))
+                    start_cut_sec = int(round(180.0 + best_intro[0] + intro_dur))
         intervals.append((0, start_cut_sec))
 
     end_cut_sec = 3543

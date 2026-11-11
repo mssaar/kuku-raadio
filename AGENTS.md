@@ -44,6 +44,6 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
   Kui saatele on lisatud oma saatepõhine lõpukõll või tunnus-intro, kasutatakse salvestamisel ja recut'imisel AINULT selle saate omi. Kui saatele pole spetsiifilist kõlli sätestatud, otsitakse üldisest hunnikust (`puhas_lopukoll_*.wav`).
 - **Otsinguaken:** Lõpukõlli otsitakse vahemikust `[start_sec + 60s, start_sec + 270s]` (kuni 4,5 min pärast pausi algust).
 - **Saate alguse ja lõpu lõikamine tunnus-intro järgi:**
-  - Kui saatele on olemas oma tunnus-intro, otsitakse saate algust aknast `[180s, 600s]`. Uudised ja eelreklaamid lõigatakse vahetult enne tunnus-introt, nii et saade algab puhtalt intro algusest.
+  - Kui saatele on olemas oma tunnus-intro, otsitakse saate algust aknast `[180s, 600s]`. Uudised, eelreklaamid ja tunnus-intro ise lõigatakse välja (`start_cut_sec = intro_algus + intro_kestus`), nii et saade algab puhtalt vahetult jutu algusest.
   - Saate lõppu otsitakse aknast `[3300s, 3600s]`. Tunnus-intro tuvastamisel lastakse lõputunnusel kõlada ning saade lõpeb vahetult enne täistunni uudiseid (u 3595s).
   - Kui saatele pole spetsiifilist introt sätestatud või seda ei tuvastata, jäävad kasutusse vaikeajad `(0, 413)` (6:53) ja `3543` (59:03, +80s pikendatud).
