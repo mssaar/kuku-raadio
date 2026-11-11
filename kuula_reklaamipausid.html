@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Kuku Raadio — Reklaamipauside ja Saatelõppude Ülekuulamine</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #121214;
+      color: #fff;
+      line-height: 1.5;
+    }
+    h1 { font-size: 24px; margin-bottom: 6px; color: #fff; }
+    p.lead { color: #aaa; font-size: 14px; margin-bottom: 24px; }
+    .card {
+      background: #1a1a1e;
+      border: 1px solid #2a2a2e;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #38bdf8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    audio { width: 100%; margin: 12px 0 16px 0; outline: none; }
+    .player-label { font-size: 13px; font-weight: 600; color: #cbd5e1; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #2a2a2e; }
+    th { color: #888; font-weight: 600; }
+    .highlight { color: #f59e0b; font-weight: bold; }
+    .highlight-green { color: #34d399; font-weight: bold; }
+    .note {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid #38bdf8;
+      padding: 8px 12px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Kuku Raadio Salvestiste ja Reklaamipauside Ülekuulamine</h1>
+  <p class="lead">Siit saad mugavalt üle kuulata viimase Digitunni ja Tarkade Klubi reklaamipausid ning kontrollida uut 80s võrra pikemat saate lõppu.</p>
+
+  <!-- 1. DIGITUND 1. REKLAAMIPAUS -->
+  <div class="card">
+    <h2>
+      <span>1. Digitund (09.11.2026) — 1. reklaamipaus</span>
+      <span class="badge badge-amber">Lõpukõll puudus</span>
+    </h2>
+    <p style="color: #aaa; font-size: 13px;">Eetriaeg 18:30 – 21:20 (toorheli sekundid 1110s – 1280s).</p>
+    
+    <div class="player-label">▶ Täispikk paus (alguskõll, reklaamid, saate jätkumine):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/digitund_paus1.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/digitund_paus1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="player-label">▶ Lühiklipp: Reklaami lõpp ja saate jätkumine (fookus 20:15 – 20:40):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/digitund_paus1_uleminek.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/digitund_paus1_uleminek.mp3" type="audio/mpeg">
+    </audio>
+
+    <table>
+      <thead>
+        <tr><th>Klipis</th><th>Eetris</th><th>Mis toimub</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>00:00 – 00:09</td><td>18:30 – 18:39</td><td>Saatejuhtide jutt enne reklaami</td></tr>
+        <tr><td>00:09 – 00:13</td><td>18:39 – 18:43</td><td>Kuku reklaami <b>alguskõll</b> (tuvastatud 99.1%)</td></tr>
+        <tr><td>00:13 – 01:52</td><td>18:43 – 20:22</td><td>Reklaamid ja vaheklipid</td></tr>
+        <tr class="highlight"><td>01:52 – 02:04</td><td>20:22 – 20:34</td><td>Vaikuse pausid / üleminek (ükski teadaolev lõpukõll ei klappinud)</td></tr>
+        <tr><td>02:04 – 02:50</td><td>20:34 – 21:20</td><td>Saade <b>jätkub</b> stuudiost</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>Miks lõpukõlli ei leitud:</strong> Akustiline tuvastaja kontrollis kõiki 7 etalon-lõpukõlli, kuid parim skoor oli vaid 0.11 (lävend 0.60).
+    </div>
+  </div>
+
+  <!-- 2. TARKADE KLUBI 2. REKLAAMIPAUS -->
+  <div class="card">
+    <h2>
+      <span>2. Tarkade Klubi (07.11.2026) — 2. reklaamipaus</span>
+      <span class="badge badge-amber">Lõpukõll puudus</span>
+    </h2>
+    <p style="color: #aaa; font-size: 13px;">Eetriaeg 44:10 – 47:00 (toorheli sekundid 2650s – 2820s).</p>
+    
+    <div class="player-label">▶ Täispikk 2. paus (alguskõll, reklaamid, saate jätkumine):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/tarkade_klubi_paus2.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/tarkade_klubi_paus2.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="player-label">▶ Lühiklipp: Reklaami lõpp ja saate jätkumine (fookus 46:20 – 46:40):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/tarkade_klubi_paus2_uleminek.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/tarkade_klubi_paus2_uleminek.mp3" type="audio/mpeg">
+    </audio>
+
+    <table>
+      <thead>
+        <tr><th>Klipis</th><th>Eetris</th><th>Mis toimub</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>00:00 – 00:08</td><td>44:10 – 44:18</td><td>Saatejuhi küsimus/jutt enne pausi</td></tr>
+        <tr><td>00:08 – 00:12</td><td>44:18 – 44:22</td><td>Kuku reklaami <b>alguskõll</b> (tuvastatud 98.6%)</td></tr>
+        <tr><td>00:12 – 02:18</td><td>44:22 – 46:28</td><td>Reklaamid (kestus ~2m 06s)</td></tr>
+        <tr class="highlight"><td>02:18 – 02:20</td><td>46:28 – 46:30</td><td>Vaikus enne saate naasmist (lõpukõlli ei kõlanud)</td></tr>
+        <tr><td>02:20 – 02:50</td><td>46:30 – 47:00</td><td>Tarkade Klubi saade <b>jätkub</b></td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>Miks lõpukõlli ei leitud:</strong> Kõik 7 lõpukõlli etaloni andsid korrelatsiooniks alla 0.09.
+    </div>
+  </div>
+
+  <!-- 3. TARKADE KLUBI 1. REKLAAMIPAUS -->
+  <div class="card">
+    <h2>
+      <span>3. Tarkade Klubi (07.11.2026) — 1. reklaamipaus (Võrdluseks)</span>
+      <span class="badge badge-amber">Lõpukõll puudus</span>
+    </h2>
+    <p style="color: #aaa; font-size: 13px;">Eetriaeg 19:50 – 22:40 (toorheli sekundid 1190s – 1360s).</p>
+    
+    <div class="player-label">▶ Täispikk 1. paus (alguskõll, reklaamid, saate jätkumine):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/tarkade_klubi_paus1.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/tarkade_klubi_paus1.mp3" type="audio/mpeg">
+    </audio>
+
+    <table>
+      <thead>
+        <tr><th>Klipis</th><th>Eetris</th><th>Mis toimub</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>00:00 – 00:07</td><td>19:50 – 19:57</td><td>Jutt enne pausi</td></tr>
+        <tr><td>00:07 – 00:11</td><td>19:57 – 20:01</td><td>Reklaami <b>alguskõll</b> (tuvastatud 99.5%)</td></tr>
+        <tr><td>00:11 – 02:08</td><td>20:01 – 21:58</td><td>Reklaamid (kestus ~1m 57s)</td></tr>
+        <tr class="highlight"><td>02:08</td><td>21:58</td><td>Saade jätkub (lõpukõll puudus)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. SAATE LÕPP (+80s) -->
+  <div class="card">
+    <h2>
+      <span>4. Saatelõpud: Vana lõige (57:43) vs Uus lõige (59:03, +80s)</span>
+      <span class="badge badge-green">Pikendatud +80s</span>
+    </h2>
+    <p style="color: #aaa; font-size: 13px;">Eetriaeg 57:30 – 59:30. Kuula, kuidas vana lõikega (0:13 klipis) jäi jutt pooleli, uue lõikega (1:33 klipis) saab saade loomulikult lõppeda!</p>
+
+    <div class="player-label">▶ Digitund — Saate lõpuosa (57:30 – 59:30):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/digitund_lopp.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/digitund_lopp.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="player-label">▶ Tarkade Klubi — Saate lõpuosa (57:30 – 59:30):</div>
+    <audio controls preload="metadata">
+      <source src="audioklipid/tarkade_klubi_lopp.mp3" type="audio/mpeg">
+      <source src="../recordings/audioklipid/tarkade_klubi_lopp.mp3" type="audio/mpeg">
+    </audio>
+
+    <table>
+      <thead>
+        <tr><th>Klipis</th><th>Eetris</th><th>Mis toimub</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>00:00 – 00:13</td><td>57:30 – 57:43</td><td>Saate sisu kestab</td></tr>
+        <tr class="highlight"><td>00:13</td><td>57:43 (3463s)</td><td><b>Vana lõikepunkt:</b> saade katkestati siin, jutt jäi pooleli!</td></tr>
+        <tr class="highlight-green"><td>00:13 – 01:33</td><td>57:43 – 59:03</td><td><b>+80 sekundit:</b> Saatejuhid räägivad lõpuni, teevad kokkuvõtte ja hüvastijätu</td></tr>
+        <tr class="highlight-green"><td>01:33</td><td>59:03 (3543s)</td><td><b>Uus lõikepunkt:</b> saade lõpeb puhtalt enne täistunni uudiseid</td></tr>
+        <tr><td>01:33 – 02:00</td><td>59:03 – 59:30</td><td>Täistunni eelne muusika/uudistekõll</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>Seadistus tehtud:</strong> Failides <code>kuku/live.py</code> ja <code>kuku/jingles.py</code> on lõpukärbe nüüd 3543s (59:03).
+    </div>
+  </div>
+</body>
+</html>
