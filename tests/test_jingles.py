@@ -40,9 +40,11 @@ def test_assets_contain_all_jingles():
     from kuku.jingles import ASSETS_DIR
     wavs = list(ASSETS_DIR.glob("puhas_lopukoll_*.wav"))
     assert len(wavs) >= 6
-    # Tarkade Klubi (231) saatepõhine kõll
-    tk_wavs = list(ASSETS_DIR.glob("saade_231_lopukoll_*.wav"))
-    assert len(tk_wavs) >= 1
+    # Kõigi 4 saate saatepõhised tunnus-introd
+    assert len(list(ASSETS_DIR.glob("saade_231_lopukoll_*.wav"))) >= 1  # Tarkade Klubi
+    assert len(list(ASSETS_DIR.glob("saade_209_lopukoll_*.wav"))) >= 1  # Digitund
+    assert len(list(ASSETS_DIR.glob("saade_214_lopukoll_*.wav"))) >= 1  # Buum
+    assert len(list(ASSETS_DIR.glob("saade_111513_lopukoll_*.wav"))) >= 1  # Jäljed gloobusel
 
 
 def test_detect_ad_intervals_uses_show_specific_template(tmp_path, monkeypatch):
