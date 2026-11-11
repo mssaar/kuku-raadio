@@ -102,9 +102,9 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
         intervals.append((0, 413))
 
     for start_sec, sim in mid_show_starts:
-        # Otsime lõpukõlli aknast [start_sec + 60s, start_sec + 160s]
+        # Otsime lõpukõlli aknast [start_sec + 60s, start_sec + 270s] (reklaamipausid võivad kesta kuni 4,5 min)
         search_start = int((start_sec + 60) * SAMPLE_RATE)
-        search_end = min(len(audio), int((start_sec + 160) * SAMPLE_RATE))
+        search_end = min(len(audio), int((start_sec + 270) * SAMPLE_RATE))
         window_audio = audio[search_start:search_end]
         window_sq = audio_sq[search_start:search_end]
 
