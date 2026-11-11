@@ -36,6 +36,9 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
 - Iga muudatuse järel tuleb käivitada nii Pythoni (`pytest`) kui ka JS (`npm test`) testid.
 
 ## 6. Reklaamikõllide ja lõikamise reeglid
-- **Saatepõhised lõpukõllid (`kuku/assets/saade_{show_id}_lopukoll_*.wav`):** Kui saatele (nt Tarkade Klubi ID 231) on lisatud oma saatepõhine lõpukõll või tunnus-intro, kasutatakse salvestamisel ja recut'imisel AINULT selle saate omi. Kui saatele pole spetsiifilist kõlli sätestatud, otsitakse üldisest hunnikust (`puhas_lopukoll_*.wav`).
+- **Saatepõhised lõpukõllid ja tunnus-introd (`kuku/assets/saade_{show_id}_lopukoll_*.wav`):** Kui saatele (nt Tarkade Klubi ID 231) on lisatud oma saatepõhine lõpukõll või tunnus-intro, kasutatakse salvestamisel ja recut'imisel AINULT selle saate omi. Kui saatele pole spetsiifilist kõlli sätestatud, otsitakse üldisest hunnikust (`puhas_lopukoll_*.wav`).
 - **Otsinguaken:** Lõpukõlli otsitakse vahemikust `[start_sec + 60s, start_sec + 270s]` (kuni 4,5 min pärast pausi algust).
-- **Saate lõpp:** Salvestise lõpukärbe on seadistatud 3543 sekundile (59:03, 80 sekundit hilisem kui vana 57:43), et saatejuhtide lõpusõnad ja hüvastijätt ei katkeks enne täistunni uudiseid.
+- **Saate alguse ja lõpu lõikamine tunnus-intro järgi:**
+  - Kui saatele on olemas oma tunnus-intro, otsitakse saate algust aknast `[180s, 600s]`. Uudised ja eelreklaamid lõigatakse vahetult enne tunnus-introt (Tarkade Klubi puhul 07:41 / 461s), nii et saade algab puhtalt intro algusest.
+  - Saate lõppu otsitakse aknast `[3300s, 3600s]`. Tunnus-intro tuvastamisel (Tarkade Klubi puhul 59:43 / 3583s) lastakse lõputunnusel kõlada ning saade lõpeb vahetult enne täistunni uudiseid (u 3595s).
+  - Kui saatele pole spetsiifilist introt sätestatud või seda ei tuvastata, jäävad kasutusse vaikeajad `(0, 413)` (6:53) ja `3543` (59:03, +80s pikendatud).

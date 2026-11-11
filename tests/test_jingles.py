@@ -82,3 +82,49 @@ def test_detect_ad_intervals_uses_show_specific_template(tmp_path, monkeypatch):
     assert "saade_231_lopukoll_1.wav" not in loaded_paths
 
 
+def test_detect_ad_intervals_cuts_start_and_end_by_theme_intro(tmp_path, monkeypatch):
+    assets_dir = tmp_path / "assets"
+    assets_dir.mkdir()
+    (assets_dir / "puhas_alguskoll.wav").write_bytes(b"dummy")
+    (assets_dir / "saade_231_lopukoll_1.wav").write_bytes(b"dummy")
+
+    fake_audio = tmp_path / "test.mp3"
+    fake_audio.write_bytes(b"audio")
+
+    sr = 1000  # kiirendatud diskreetimissagedus testimiseks
+    monkeypatch.setattr("kuku.jingles.SAMPLE_RATE", sr)
+
+    # Loome simuleeritud 3600s heli ja 6s pikkuse tunnusheli
+    intro_dur_sec = 6
+    np.random.seed(42)
+    intro_wave = np.random.randn(sr * intro_dur_sec).astype(np.float32)
+    start_jingle_wave = np.random.randn(sr * 3).astype(np.float32)
+
+    total_len = sr * 3600
+    full_audio = np.random.randn(total_len).astype(np.float32) * 0.05
+    # Paigutame tunnus-intro algusesse (t=460s) ja lõppu (t=3580s)
+    full_audio[460 * sr : 460 * sr + len(intro_wave)] += intro_wave * 5.0
+    full_audio[3580 * sr : 3580 * sr + len(intro_wave)] += intro_wave * 5.0
+
+    def mock_load(path, sr=sr):
+        p = Path(path).name
+        if p == "saade_231_lopukoll_1.wav":
+            return intro_wave
+        if p == "puhas_alguskoll.wav":
+            return start_jingle_wave
+        return full_audio
+
+    monkeypatch.setattr("kuku.jingles.load_audio", mock_load)
+
+    # 1. show_id=231 puhul lõikab alguse 460s pealt ja lõpu 3580 + 12 = 3592s pealt
+    intervals = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=True, show_id=231)
+    assert intervals[0] == (0, 460)
+    assert intervals[-1] == (3592, 3600)
+
+    # 2. cut_start=False puhul algust ei lõigata (ei lisata (0, 460))
+    intervals_no_cut = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=False, show_id=231)
+    assert intervals_no_cut[0] != (0, 460)
+    assert intervals_no_cut[-1] == (3592, 3600)
+
+
+

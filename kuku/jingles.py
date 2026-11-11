@@ -106,16 +106,50 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
         t_zero = t - np.mean(t)
         end_tpl_norms.append((t_zero, np.sum(t_zero ** 2), len(t) / SAMPLE_RATE))
 
-    # Reegel:
-    # 1. 0:00 - 6:53 (413s, 5s varuga) lõigatakse ainult siis, kui cut_start on tõene (täistunnil alustades)
-    # 2. 59:03 (3543s) kuni saate lõpp lõigatakse ainult siis, kui fail on piisavalt pikk
-    # 3. Vahepausid on need, mis jäävad alguse ja lõpu vahele
-    min_mid_start = 413 if cut_start else 0
-    mid_show_starts = [p for p in all_start_peaks if min_mid_start <= p[0] <= 3543]
-
+    # 3. Saate alguse ja lõpu paika lõikamine tunnus-intro või vaikeaegade järgi:
+    # Kui saatele on spetsiifiline tunnus-intro, otsitakse saate algust aknast [180s, 600s]
+    # ja lõppu aknast [3300s, 3600s]. Muul juhul kasutatakse vaikeaegu (0-413s ja 3543s-lõpp).
     intervals: list[tuple[int, int]] = []
+    start_cut_sec = 413
     if cut_start:
-        intervals.append((0, 413))
+        if show_specific_templates and end_tpl_norms and audio_len_sec >= 180:
+            intro_tpl, intro_energy, intro_dur = end_tpl_norms[0]
+            search_start_idx = int(180 * SAMPLE_RATE)
+            search_end_idx = min(len(audio), int(600 * SAMPLE_RATE))
+            if search_end_idx - search_start_idx >= len(intro_tpl):
+                win_audio = audio[search_start_idx:search_end_idx]
+                win_sq = audio_sq[search_start_idx:search_end_idx]
+                c_intro = scipy.signal.fftconvolve(win_audio, intro_tpl[::-1], mode="valid")
+                o_intro = np.ones(len(intro_tpl))
+                e_intro = scipy.signal.fftconvolve(win_sq, o_intro, mode="valid")
+                norm_intro = c_intro / np.sqrt(e_intro * intro_energy + 1e-6)
+                intro_peaks = _find_peaks(norm_intro, SAMPLE_RATE, threshold=0.65, min_dist_sec=5.0)
+                if intro_peaks:
+                    best_intro = max(intro_peaks, key=lambda x: x[1])
+                    start_cut_sec = int(round(180.0 + best_intro[0]))
+        intervals.append((0, start_cut_sec))
+
+    end_cut_sec = 3543
+    if show_specific_templates and end_tpl_norms and audio_len_sec >= 3300:
+        intro_tpl, intro_energy, intro_dur = end_tpl_norms[0]
+        search_outro_start_idx = int(3300 * SAMPLE_RATE)
+        search_outro_end_idx = min(len(audio), int(3600 * SAMPLE_RATE))
+        if search_outro_end_idx - search_outro_start_idx >= len(intro_tpl):
+            win_audio = audio[search_outro_start_idx:search_outro_end_idx]
+            win_sq = audio_sq[search_outro_start_idx:search_outro_end_idx]
+            c_outro = scipy.signal.fftconvolve(win_audio, intro_tpl[::-1], mode="valid")
+            o_outro = np.ones(len(intro_tpl))
+            e_outro = scipy.signal.fftconvolve(win_sq, o_outro, mode="valid")
+            norm_outro = c_outro / np.sqrt(e_outro * intro_energy + 1e-6)
+            outro_peaks = _find_peaks(norm_outro, SAMPLE_RATE, threshold=0.65, min_dist_sec=5.0)
+            if outro_peaks:
+                best_outro = max(outro_peaks, key=lambda x: x[1])
+                outro_time = 3300.0 + best_outro[0]
+                outro_duration = max(intro_dur, 12.0)
+                end_cut_sec = int(round(outro_time + outro_duration))
+
+    min_mid_start = start_cut_sec if cut_start else 0
+    mid_show_starts = [p for p in all_start_peaks if min_mid_start <= p[0] <= end_cut_sec]
 
     for start_sec, sim in mid_show_starts:
         # Otsime lõpukõlli aknast [start_sec + 60s, start_sec + 270s] (reklaamipausid võivad kesta kuni 4,5 min)
@@ -148,7 +182,7 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
 
         intervals.append((int(round(start_sec)), end_time))
 
-    # Lõpu kärpimine (ainult siis, kui salvestus ulatub saate lõpuni)
-    if audio_len_sec > 3543:
-        intervals.append((3543, int(round(audio_len_sec))))
+    # Lõpu kärpimine (ainult siis, kui salvestus ulatub üle tuvastatud saate lõpu)
+    if audio_len_sec > end_cut_sec:
+        intervals.append((end_cut_sec, int(round(audio_len_sec))))
     return sorted(intervals)
