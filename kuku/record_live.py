@@ -97,7 +97,7 @@ def main():
         record_stream(STREAM_URL, str(raw_mp3), args.duration * 60)
 
         # 2. Reklaamide eemaldamine (kõllituvastusega toorfailist)
-        ad_intervals = get_ad_intervals(args.ad_times, audio_path=raw_mp3, cut_start=args.cut_start)
+        ad_intervals = get_ad_intervals(args.ad_times, audio_path=raw_mp3, cut_start=args.cut_start, show_id=args.show_id)
         if ad_intervals:
             print(f"Eemaldan reklaamid ({len(ad_intervals)} intervalli: {ad_intervals})...")
             remove_ads(str(raw_mp3), str(clean_mp3), ad_intervals)

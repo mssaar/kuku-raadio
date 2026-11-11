@@ -40,11 +40,17 @@ def parse_time_seconds(time_str: str) -> int:
     return int(time_str) * 60
 
 
-def get_ad_intervals(ad_times_str: str, audio_path: str | Path = None, cut_start: bool = True) -> list[tuple[int, int]]:
+def get_ad_intervals(
+    ad_times_str: str,
+    audio_path: str | Path = None,
+    cut_start: bool = True,
+    show_id: int | None = None,
+) -> list[tuple[int, int]]:
     """Tagastab reklaamide vahemikud sekundites.
     
     Kui ad_times_str on 'auto' ja audio_path on antud, tuvastatakse intervallid
-    akustiliselt reklaamikõllide järgi.
+    akustiliselt reklaamikõllide järgi. Kui show_id on määratud, eelistatakse selle
+    saate spetsiifilisi lõpukõlle.
     """
     if not ad_times_str:
         return []
@@ -53,7 +59,7 @@ def get_ad_intervals(ad_times_str: str, audio_path: str | Path = None, cut_start
         if audio_path and os.path.exists(audio_path):
             try:
                 from kuku.jingles import detect_ad_intervals
-                detected = detect_ad_intervals(audio_path, cut_start=cut_start)
+                detected = detect_ad_intervals(audio_path, cut_start=cut_start, show_id=show_id)
                 if detected:
                     return detected
             except Exception as e:

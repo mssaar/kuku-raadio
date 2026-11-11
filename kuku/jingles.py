@@ -56,8 +56,12 @@ def _find_peaks(norm_corr: np.ndarray, sr: int, threshold: float = 0.65, min_dis
     return [(idx / sr, float(norm_corr[idx])) for idx in peaks]
 
 
-def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_start: bool = True) -> list[tuple[int, int]]:
-    """Tuvastab helifailist reklaami alguskõllid ja lõpukõllid ning tagastab eemaldatavad intervallid."""
+def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_start: bool = True, show_id: int | None = None) -> list[tuple[int, int]]:
+    """Tuvastab helifailist reklaami alguskõllid ja lõpukõllid ning tagastab eemaldatavad intervallid.
+    
+    Kui show_id on antud ja saatele on olemas oma saatepõhised lõpukõllid (saade_{show_id}_lopukoll_*.wav),
+    kasutatakse AINULT selle saate omi. Muul juhul otsitakse üldisest lõpukõllide kogust (puhas_lopukoll_*.wav).
+    """
     assets = assets_dir or ASSETS_DIR
     start_tpl_path = assets / "puhas_alguskoll.wav"
     if not start_tpl_path.exists():
@@ -83,9 +87,21 @@ def detect_ad_intervals(audio_path: str | Path, assets_dir: Path = None, cut_sta
 
     all_start_peaks = _find_peaks(norm_corr_start, SAMPLE_RATE, threshold=0.70, min_dist_sec=10.0)
 
-    # Laeme lõpukõllide etalonid (kõik saadaolevad puhas_lopukoll_*.wav failid)
+    # 2. Laeme lõpukõllide etalonid.
+    # Kui saatele on sätestatud konkreetsed saatepõhised lõpukõllid (nt saade_{show_id}_lopukoll_*.wav),
+    # siis arvestatakse AINULT neid. Muul juhul otsitakse üldisest hunnikust (puhas_lopukoll_*.wav).
     end_tpl_norms = []
-    for p in sorted(assets.glob("puhas_lopukoll_*.wav")):
+    show_specific_templates = []
+    if show_id is not None:
+        show_specific_templates = sorted(assets.glob(f"saade_{show_id}_lopukoll_*.wav"))
+        if not show_specific_templates:
+            show_dir = assets / "shows" / str(show_id)
+            if show_dir.exists():
+                show_specific_templates = sorted(show_dir.glob("*.wav"))
+
+    target_templates = show_specific_templates if show_specific_templates else sorted(assets.glob("puhas_lopukoll_*.wav"))
+
+    for p in target_templates:
         t = load_audio(p, sr=SAMPLE_RATE)
         t_zero = t - np.mean(t)
         end_tpl_norms.append((t_zero, np.sum(t_zero ** 2), len(t) / SAMPLE_RATE))

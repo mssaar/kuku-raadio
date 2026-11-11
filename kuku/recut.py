@@ -60,7 +60,7 @@ def recut_episode(
 
         intervals_to_use = ad_intervals
         if ad_intervals == "auto" or (isinstance(ad_intervals, list) and not ad_intervals):
-            intervals_to_use = get_ad_intervals("auto", audio_path=input_mp3)
+            intervals_to_use = get_ad_intervals("auto", audio_path=input_mp3, show_id=show_id)
 
         print(f"Lõikan reklaamid vahemikega: {intervals_to_use}...")
         do_remove_ads(str(input_mp3), str(output_mp3), intervals_to_use)

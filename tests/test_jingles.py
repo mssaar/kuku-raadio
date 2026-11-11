@@ -40,4 +40,45 @@ def test_assets_contain_all_jingles():
     from kuku.jingles import ASSETS_DIR
     wavs = list(ASSETS_DIR.glob("puhas_lopukoll_*.wav"))
     assert len(wavs) >= 6
+    # Tarkade Klubi (231) saatepõhine kõll
+    tk_wavs = list(ASSETS_DIR.glob("saade_231_lopukoll_*.wav"))
+    assert len(tk_wavs) >= 1
+
+
+def test_detect_ad_intervals_uses_show_specific_template(tmp_path, monkeypatch):
+    assets_dir = tmp_path / "assets"
+    assets_dir.mkdir()
+    (assets_dir / "puhas_alguskoll.wav").write_bytes(b"dummy")
+    (assets_dir / "puhas_lopukoll_1.wav").write_bytes(b"dummy")
+    (assets_dir / "saade_231_lopukoll_1.wav").write_bytes(b"dummy")
+
+    fake_audio = tmp_path / "test.mp3"
+    fake_audio.write_bytes(b"audio")
+
+    loaded_paths = []
+
+    def mock_load(path, sr=8000):
+        loaded_paths.append(Path(path).name)
+        # Return 1 second of silence
+        return np.zeros(sr, dtype=np.float32)
+
+    monkeypatch.setattr("kuku.jingles.load_audio", mock_load)
+
+    # 1. show_id=231 puhul peab laadima AINULT saade_231_lopukoll_1.wav ja MITTE puhas_lopukoll_1.wav
+    loaded_paths.clear()
+    detect_ad_intervals(fake_audio, assets_dir=assets_dir, show_id=231)
+    assert "saade_231_lopukoll_1.wav" in loaded_paths
+    assert "puhas_lopukoll_1.wav" not in loaded_paths
+
+    # 2. Saate puhul, millel pole oma kõlli (nt show_id=999 või None), laaditakse üldine hunnik (puhas_lopukoll_1.wav)
+    loaded_paths.clear()
+    detect_ad_intervals(fake_audio, assets_dir=assets_dir, show_id=999)
+    assert "puhas_lopukoll_1.wav" in loaded_paths
+    assert "saade_231_lopukoll_1.wav" not in loaded_paths
+
+    loaded_paths.clear()
+    detect_ad_intervals(fake_audio, assets_dir=assets_dir, show_id=None)
+    assert "puhas_lopukoll_1.wav" in loaded_paths
+    assert "saade_231_lopukoll_1.wav" not in loaded_paths
+
 

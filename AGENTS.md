@@ -34,3 +34,8 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
 - Kasutajaliidese ja dokumentatsiooni keel on **eesti keel** (mittetehniline, selge, kasutajasõbralik).
 - Veebileht töötab täielikult staatilisena ilma kompileerimiseta (vanilla ES modules).
 - Iga muudatuse järel tuleb käivitada nii Pythoni (`pytest`) kui ka JS (`npm test`) testid.
+
+## 6. Reklaamikõllide ja lõikamise reeglid
+- **Saatepõhised lõpukõllid (`kuku/assets/saade_{show_id}_lopukoll_*.wav`):** Kui saatele (nt Tarkade Klubi ID 231) on lisatud oma saatepõhine lõpukõll või tunnus-intro, kasutatakse salvestamisel ja recut'imisel AINULT selle saate omi. Kui saatele pole spetsiifilist kõlli sätestatud, otsitakse üldisest hunnikust (`puhas_lopukoll_*.wav`).
+- **Otsinguaken:** Lõpukõlli otsitakse vahemikust `[start_sec + 60s, start_sec + 270s]` (kuni 4,5 min pärast pausi algust).
+- **Saate lõpp:** Salvestise lõpukärbe on seadistatud 3543 sekundile (59:03, 80 sekundit hilisem kui vana 57:43), et saatejuhtide lõpusõnad ja hüvastijätt ei katkeks enne täistunni uudiseid.

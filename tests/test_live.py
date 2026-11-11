@@ -211,14 +211,16 @@ def test_get_ad_intervals_with_audio_path_calls_detector(tmp_path, monkeypatch):
     fake_mp3.write_bytes(b"dummy")
 
     called_kwargs = {}
-    def fake_detect(path, assets_dir=None, cut_start=True):
+    def fake_detect(path, assets_dir=None, cut_start=True, show_id=None):
         called_kwargs["cut_start"] = cut_start
+        called_kwargs["show_id"] = show_id
         return [(100, 200)]
 
     monkeypatch.setattr(jingles, "detect_ad_intervals", fake_detect)
-    res = get_ad_intervals("auto", audio_path=fake_mp3, cut_start=False)
+    res = get_ad_intervals("auto", audio_path=fake_mp3, cut_start=False, show_id=231)
     assert res == [(100, 200)]
     assert called_kwargs["cut_start"] is False
+    assert called_kwargs["show_id"] == 231
 
 
 def test_get_ad_intervals_fallback_omits_intro_when_cut_start_false():
