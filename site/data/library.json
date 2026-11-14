@@ -263,6 +263,14 @@
    "name": "Tarkade klubi",
    "episodes": [
     {
+     "id": 1794654002,
+     "title": "Tarkade klubi (14.11.2026)",
+     "published_at": "2026-11-14T11:00:02Z",
+     "expires_at": "2027-05-15T11:00:02Z",
+     "duration_seconds": 2712,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-231/1794654002.mp3"
+    },
+    {
      "id": 1794049202,
      "title": "Tarkade klubi (07.11.2026)",
      "published_at": "2026-11-07T11:00:02Z",
