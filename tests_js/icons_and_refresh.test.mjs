@@ -34,11 +34,17 @@ test("app.js sisaldab värskendamise ikooni ja uut Kuku logo märki", () => {
 
 test("sw.js kasutab uut puhvriversiooni ja sisaldab live_schedule.js", () => {
   const swJs = fs.readFileSync(path.join(SITE_DIR, "sw.js"), "utf-8");
-  assert.ok(swJs.includes('"kuku-v11"') || swJs.includes('"kuku-v10"'), "sw.js peab kasutama kehtivat CACHE_NAME");
+  assert.ok(swJs.includes('"kuku-v12"') || swJs.includes('"kuku-v11"'), "sw.js peab kasutama kehtivat CACHE_NAME");
   assert.ok(swJs.includes("live_schedule.js"), "sw.js ASSETS peab sisaldama live_schedule.js");
   assert.ok(swJs.includes("live_detector.js"), "sw.js ASSETS peab sisaldama live_detector.js");
   assert.ok(swJs.includes("jingles.json"), "sw.js ASSETS peab sisaldama jingles.json");
   assert.ok(swJs.includes("version.js"), "sw.js ASSETS peab sisaldama version.js");
+});
+
+test("style.css kuvab Kuulatud sildi ja ikooni rohelisena", () => {
+  const css = fs.readFileSync(path.join(SITE_DIR, "style.css"), "utf-8");
+  assert.match(css, /--heard:\s*#4ade80/i, "Roheline --heard värv peab olema defineeritud");
+  assert.match(css, /\.ep__meta \.heard\s*\{[^}]*color:\s*var\(--heard\)/, ".ep__meta .heard peab kasutama --heard värvi");
 });
 
 test("index.html ja manifest.webmanifest kasutavad vahemälu versiooniparameetreid", () => {

@@ -26,13 +26,10 @@ class FakeKuku:
         return self.shows
 
     def list_episodes(self, show_id, since):
-        value = self.episodes[show_id]
-        if value is ShowNotFound:
-            raise ShowNotFound(show_id)
-        return [e for e in value if e.published_at >= since]
+        raise AssertionError("sync ei tohi Kuku järelkuulamise API-st osi küsida")
 
     def episode_url(self, episode_id):
-        return f"https://cdn/{episode_id}.mp3"
+        raise AssertionError("sync ei tohi Kuku järelkuulamise API-st helifaile küsida")
 
 
 class FakeGitHub:
@@ -92,31 +89,55 @@ def read(data, name):
     return json.loads((data / name).read_text(encoding="utf-8"))
 
 
-def test_downloads_free_episodes_and_writes_library(data):
+def test_does_not_download_free_episodes_from_kuku_api(data):
     gh = FakeGitHub()
-    kuku = FakeKuku({209: [ep(2, 1), ep(1, 8, premium=True)]})
-    assert sync(data, kuku, gh, good_download, NOW) == []
-    assert list(gh.releases["saade-209"]["assets"]) == ["2.mp3"]
+    calls = []
+    kuku = FakeKuku({209: [ep(2, 1), ep(1, 8, premium=False)]})
+    assert sync(data, kuku, gh, lambda u, d: calls.append(u), NOW) == []
+    assert calls == []
+    assert gh.releases["saade-209"]["assets"] == {}
     lib = read(data, "library.json")
     assert lib["shows"][0]["name"] == "Digitund"
-    entry = lib["shows"][0]["episodes"][0]
-    assert entry["id"] == 2 and entry["url"] == "https://gh/2.mp3"
-    assert entry["expires_at"] == "2027-04-01T12:00:00Z"
+    assert lib["shows"][0]["episodes"] == []
     assert read(data, "catalog.json")["shows"][0]["name"] == "Digitund"
 
 
-def test_second_run_does_not_redownload(data):
-    gh, calls = FakeGitHub(), []
-    kuku = FakeKuku({209: [ep(2, 1)]})
-    sync(data, kuku, gh, good_download, NOW)
-    sync(data, kuku, gh, lambda u, d: calls.append(u), NOW)
-    assert calls == []
-    assert len(read(data, "library.json")["shows"][0]["episodes"]) == 1
+def test_preserves_existing_release_assets_and_known_metadata(data):
+    gh = FakeGitHub()
+    rel = gh.get_or_create_release("saade-209", "Digitund")
+    rel["assets"]["1794214801.mp3"] = {
+        "id": 50,
+        "browser_download_url": "https://gh/1794214801.mp3",
+        "label": "Digitund (09.11.2026)",
+        "created_at": "2026-10-01T09:00:01Z",
+    }
+    (data / "library.json").write_text(json.dumps({
+        "shows": [{
+            "id": 209,
+            "name": "Digitund",
+            "episodes": [{
+                "id": 1794214801,
+                "title": "Digitund (09.11.2026)",
+                "published_at": "2026-10-01T09:00:01Z",
+                "expires_at": "2027-04-01T09:00:01Z",
+                "duration_seconds": 2745,
+                "url": "https://old/1794214801.mp3",
+            }],
+        }]
+    }))
+    sync(data, FakeKuku({209: []}), gh, good_download, NOW)
+    entry = read(data, "library.json")["shows"][0]["episodes"][0]
+    assert entry["id"] == 1794214801
+    assert entry["url"] == "https://gh/1794214801.mp3"
+    assert entry["duration_seconds"] == 2745
 
 
 def test_expired_episodes_are_deleted(data):
     gh = FakeGitHub()
-    sync(data, FakeKuku({209: [ep(2, 1)]}), gh, good_download, NOW)
+    rel = gh.get_or_create_release("saade-209", "Digitund")
+    rel["assets"]["2.mp3"] = {"id": 50, "browser_download_url": "https://gh/2.mp3",
+                              "label": "Osa 2", "created_at": "2026-10-01T12:00:00Z"}
+    sync(data, FakeKuku({209: []}), gh, good_download, NOW)
     later = NOW + timedelta(days=190)
     sync(data, FakeKuku({209: []}), gh, good_download, later)
     assert gh.releases["saade-209"]["assets"] == {}
@@ -125,40 +146,14 @@ def test_expired_episodes_are_deleted(data):
 
 def test_removed_show_release_is_deleted(data):
     gh = FakeGitHub()
-    sync(data, FakeKuku({209: [ep(2, 1)]}), gh, good_download, NOW)
+    rel = gh.get_or_create_release("saade-209", "Digitund")
+    rel["assets"]["2.mp3"] = {"id": 50, "browser_download_url": "https://gh/2.mp3",
+                              "label": "Osa 2", "created_at": "2026-10-01T12:00:00Z"}
+    sync(data, FakeKuku({209: []}), gh, good_download, NOW)
     (data / "shows.json").write_text("[]")
     sync(data, FakeKuku({}), gh, good_download, NOW)
     assert "saade-209" not in gh.releases
     assert read(data, "library.json")["shows"] == []
-
-
-def test_teaser_download_raises_api_changed_and_is_not_uploaded(data):
-    gh = FakeGitHub()
-    with pytest.raises(KukuApiChanged, match="teaser"):
-        sync(data, FakeKuku({209: [ep(2, 1)]}), gh, lambda u, d: d.write_bytes(b"ID3short"), NOW)
-    assert gh.releases["saade-209"]["assets"] == {}
-
-
-def test_failed_download_skips_episode_and_continues(data):
-    gh = FakeGitHub()
-
-    def flaky(url, dest):
-        if "/2.mp3" in url:
-            raise OSError("ühendus katkes")
-        dest.write_bytes(MP3)
-
-    warnings = sync(data, FakeKuku({209: [ep(3, 1), ep(2, 8)]}), gh, flaky, NOW)
-    assert list(gh.releases["saade-209"]["assets"]) == ["3.mp3"]
-    assert any("Osa 2" in w for w in warnings)
-
-
-def test_missing_show_is_warning_not_failure(data):
-    (data / "shows.json").write_text(json.dumps([{"id": 5, "name": "Kadunud"},
-                                                 {"id": 209, "name": "Digitund"}]))
-    gh = FakeGitHub()
-    warnings = sync(data, FakeKuku({5: ShowNotFound, 209: [ep(2, 1)]}), gh, good_download, NOW)
-    assert any("Kadunud" in w for w in warnings)
-    assert "2.mp3" in gh.releases["saade-209"]["assets"]
 
 
 def test_run_reports_api_change(data):
@@ -175,17 +170,18 @@ def test_run_ok_status(data):
     assert read(data, "status.json")["ok"] is True
 
 
-def test_asset_without_library_entry_is_restored_from_kuku(data):
+def test_asset_without_library_entry_is_restored_as_orphan(data):
     gh = FakeGitHub()
     rel = gh.get_or_create_release("saade-209", "Digitund")
     rel["assets"]["2.mp3"] = {"id": 50, "browser_download_url": "https://gh/2.mp3",
                               "label": "Osa 2", "created_at": "2026-10-01T13:00:00Z"}
     calls = []
-    sync(data, FakeKuku({209: [ep(2, 1)]}), gh, lambda u, d: calls.append(u), NOW)
+    sync(data, FakeKuku({209: []}), gh, lambda u, d: calls.append(u), NOW)
     assert calls == []
     entry = read(data, "library.json")["shows"][0]["episodes"][0]
     assert entry["id"] == 2 and entry["url"] == "https://gh/2.mp3"
-    assert entry["published_at"] == "2026-10-01T12:00:00Z"
+    assert entry["title"] == "Osa 2"
+    assert entry["published_at"] == "2026-10-01T13:00:00Z"
 
 
 def test_unknown_old_asset_is_expired_by_upload_time(data):
@@ -201,27 +197,20 @@ def test_unknown_old_asset_is_expired_by_upload_time(data):
     assert entry["id"] == 8 and entry["title"] == "Uuem osa"
 
 
-def test_failed_upload_skips_episode_and_continues(data):
-    gh = FakeGitHub(fail_upload=True)
-    warnings = sync(data, FakeKuku({209: [ep(2, 1)]}), gh, good_download, NOW)
-    assert any("Osa 2" in w for w in warnings)
-    assert read(data, "library.json")["shows"][0]["episodes"] == []
-
-
-def test_network_error_for_one_show_is_warning(data):
-    import requests
-
-    class Flaky(FakeKuku):
-        def list_episodes(self, show_id, since):
-            if show_id == 5:
-                raise requests.ConnectionError("ühendus katkes")
-            return super().list_episodes(show_id, since)
-
-    (data / "shows.json").write_text(json.dumps([{"id": 5, "name": "Katki"}, {"id": 209, "name": "Digitund"}]))
+def test_deletes_obsolete_duplicate_digitund_assets(data):
     gh = FakeGitHub()
-    warnings = sync(data, Flaky({209: [ep(2, 1)]}), gh, good_download, NOW)
-    assert any("Katki" in w for w in warnings)
-    assert "2.mp3" in gh.releases["saade-209"]["assets"]
+    rel = gh.get_or_create_release("saade-209", "Digitund")
+    for ep_id in (1792131850, 309887, 309884, 309878, 1794214801):
+        rel["assets"][f"{ep_id}.mp3"] = {
+            "id": ep_id,
+            "browser_download_url": f"https://gh/{ep_id}.mp3",
+            "label": f"Osa {ep_id}",
+            "created_at": "2026-10-01T12:00:00Z",
+        }
+    sync(data, FakeKuku({209: []}), gh, good_download, NOW)
+    assert list(rel["assets"]) == ["1794214801.mp3"]
+    entries = read(data, "library.json")["shows"][0]["episodes"]
+    assert [e["id"] for e in entries] == [1794214801]
 
 
 def test_release_of_show_unknown_to_library_is_deleted(data):
@@ -288,4 +277,3 @@ def test_sync_skips_kuku_api_for_live_only_show(data):
     assert len(lib["shows"]) == 1
     assert lib["shows"][0]["id"] == 999999
     assert len(lib["shows"][0]["episodes"]) == 1
-

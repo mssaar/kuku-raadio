@@ -6,18 +6,19 @@ Käivitus: python -m kuku.sync   (vajab GITHUB_REPOSITORY ja GITHUB_TOKEN)
 import json
 import os
 import sys
-import tempfile
 import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
 
-from kuku.api import KukuApiChanged, KukuClient, ShowNotFound
-from kuku.logic import cutoff, expires_at, is_expired, looks_like_full_mp3, select_new
+from kuku.api import KukuApiChanged, KukuClient
+from kuku.logic import expires_at, is_expired
 from kuku.releases import GitHubClient
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "site" / "data"
+# Vana 10-min test-asset ja varasemad Kuku API-st tõmmatud Digitunni topeltosad
+OBSOLETE_DIGITUND_IDS = {1792131850, 309887, 309884, 309878}
 
 
 def _read(path, default):
@@ -63,29 +64,20 @@ def _orphan_entry(episode_id, asset):
     }
 
 
-def _sync_show(show, kuku, github, download, now, old_entries, warnings):
+def _sync_show(show, github, now, old_entries):
     release = github.get_or_create_release(tag_for(show["id"]), show["name"])
     assets = github.list_assets(release)
 
-    if show["id"] == 209 and "1792131850.mp3" in assets:
-        github.delete_asset(assets.pop("1792131850.mp3")["id"])
-        old_entries = [e for e in old_entries if e.get("id") != 1792131850]
+    if show["id"] == 209:
+        for obsolete_id in OBSOLETE_DIGITUND_IDS:
+            asset_name = f"{obsolete_id}.mp3"
+            if asset_name in assets:
+                github.delete_asset(assets.pop(asset_name)["id"])
+        old_entries = [e for e in old_entries if e.get("id") not in OBSOLETE_DIGITUND_IDS]
 
-    if show.get("live_only"):
-        episodes = []
-    else:
-        try:
-            episodes = kuku.list_episodes(show["id"], cutoff(now))
-        except ShowNotFound:
-            warnings.append(f"Saadet „{show['name']}“ ({show['id']}) Kukus enam pole.")
-            episodes = []
-        except requests.RequestException as exc:
-            warnings.append(f"Saate „{show['name']}“ osade nimekirja ei saanud kätte: {exc}")
-            episodes = []
-
-    # Releases on tõe allikas: iga fail saab kirje, ka siis kui library.json seda ei tunne
+    # Releases on tõe allikas: kõik osad tulevad otse-eetri salvestusest,
+    # Kuku järelkuulamise API-st enam faile alla ei laadita.
     known = {e["id"]: e for e in old_entries}
-    from_kuku = {e.id: e for e in episodes}
     entries = {}
     for name, asset in assets.items():
         try:
@@ -94,34 +86,8 @@ def _sync_show(show, kuku, github, download, now, old_entries, warnings):
             continue
         if episode_id in known:
             entries[episode_id] = {**known[episode_id], "url": asset["browser_download_url"]}
-        elif episode_id in from_kuku:
-            entries[episode_id] = _entry(from_kuku[episode_id], asset)
         else:
             entries[episode_id] = _orphan_entry(episode_id, asset)
-
-    for episode in select_new(episodes, set(entries), now):
-        with tempfile.TemporaryDirectory() as tmp:
-            dest = Path(tmp) / f"{episode.id}.mp3"
-            try:
-                download(kuku.episode_url(episode.id), dest)
-            except (OSError, requests.RequestException) as exc:
-                warnings.append(f"Osa {episode.id} („{episode.title}“) allalaadimine ebaõnnestus: {exc}")
-                continue
-            with dest.open("rb") as f:
-                head = f.read(4)
-            size = dest.stat().st_size
-            if not looks_like_full_mp3(head, size, episode.duration_seconds):
-                raise KukuApiChanged(
-                    f"osa {episode.id} fail on liiga lühike või pole MP3 "
-                    f"({size} baiti, oodati ~{int(episode.duration_seconds)} s) — "
-                    "tõenäoliselt annab Kuku nüüd ainult teaserit")
-            try:
-                asset = github.upload_asset(release, dest, dest.name, episode.title)
-            except (OSError, requests.RequestException) as exc:
-                warnings.append(f"Osa {episode.id} („{episode.title}“) üleslaadimine ebaõnnestus: {exc}")
-                continue
-        assets[dest.name] = asset
-        entries[episode.id] = _entry(episode, asset)
 
     for entry in list(entries.values()):
         if is_expired(datetime.fromisoformat(entry["published_at"]), now):
@@ -147,7 +113,7 @@ def sync(data_dir, kuku, github, download, now):
     shows_out = []
     try:
         for show in selected:
-            episodes = _sync_show(show, kuku, github, download, now, old.get(show["id"], []), warnings)
+            episodes = _sync_show(show, github, now, old.get(show["id"], []))
             shows_out.append({"id": show["id"], "name": show["name"], "episodes": episodes})
     finally:
         # kirjuta ka vea korral, et juba üles laaditud osad jääks kirja

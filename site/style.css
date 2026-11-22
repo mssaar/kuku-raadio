@@ -12,6 +12,7 @@
   --accent-press: #e0a225;
   --on-accent: #1a1406;
   --danger: #ff7a6b;
+  --heard: #4ade80;
   --radius: 10px;
   --radius-lg: 16px;
   --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -193,7 +194,7 @@ body.no-chrome .view { padding-bottom: 40px; }
 .ep__meta { grid-column: 1; color: var(--text-3); font-size: .8125rem; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
 .ep__meta .soon { color: var(--text); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
 .ep__meta .soon svg { width: 14px; height: 14px; }
-.ep__meta .heard { color: var(--text-2); display: inline-flex; align-items: center; gap: 3px; }
+.ep__meta .heard { color: var(--heard); font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
 .ep__meta .heard svg { width: 14px; height: 14px; }
 .ep .play { grid-row: 1 / span 3; grid-column: 2; width: 44px; height: 44px; background: var(--surface-2); color: var(--text); }
 .ep .play:hover { background: var(--surface-3); }

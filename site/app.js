@@ -304,7 +304,7 @@ function renderHome() {
         </a>`).join("")}</div>` : `
         <div class="empty">
           <h2>Siin pole veel ühtegi saadet</h2>
-          <p>Otsi Kuku saade ja vajuta „Salvesta“. Uued tasuta osad laaditakse edaspidi ise alla ja neid hoitakse 6 kuud.</p>
+          <p>Otsi Kuku saade ja vajuta „Salvesta“. Uued osad salvestatakse edaspidi otse-eetrist reklaamivabalt ja neid hoitakse 6 kuud.</p>
           <a class="pill pill--primary" href="#/otsi">${ICONS.search} Otsi saadet</a>
         </div>`}
     </section>`;
@@ -349,7 +349,7 @@ function renderShow(id) {
   } else if (!lib) {
     body = `<div class="empty"><h2>Ootel</h2><p>Esimesed osad ilmuvad mõne minuti jooksul. Laadimine võtab aega, sest iga osa on umbes 100 MB.</p></div>`;
   } else if (!episodes.length) {
-    body = `<div class="empty"><h2>Praegu pole ühtegi tasuta osa</h2><p>Kuku annab osi tasuta kuulata umbes kuu aega. Uued osad lisanduvad siia ise, kui need ilmuvad.</p></div>`;
+    body = `<div class="empty"><h2>Praegu pole veel ühtegi salvestatud osa</h2><p>Uued osad salvestatakse siia automaatselt pärast saate eetrisse minekut.</p></div>`;
   } else {
     body = `<ul class="episodes">${list}</ul>`;
   }

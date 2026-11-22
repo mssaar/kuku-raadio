@@ -253,7 +253,7 @@ Floats 6px above the tabs, 8px from the screen edges, max 744px. Amber Dusk back
 Opens on one axis, bottom-up (420ms ease-out), closes downward (280ms ease-in). Full-screen gradient from dark amber at the top into bg. Header: chevron-down close, "Praegu mängib" label, speed toggle. Large cover centered in the flexible stage; controls anchored at the bottom: title, show link, scrubber (4px track, text-colored fill and 14px thumb on a 22% white track, tabular times), transport (-15 s, 72px play, +30 s).
 
 ### Status lines
-Episode metadata is a wrapping row of text-3 facts (date, duration, expiry). "Kuulatud" carries a check icon in text-2. Imminent expiry ("Kustub varsti") is promoted to text color at 700 weight with a clock icon: urgency through weight and an icon, not through the accent.
+Episode metadata is a wrapping row of text-3 facts (date, duration, expiry). "Kuulatud" carries a check icon and label in green (`--heard`, `#4ade80`) so listened episodes stand out clearly. Imminent expiry ("Kustub varsti") is promoted to text color at 700 weight with a clock icon: urgency through weight and an icon, not through the accent.
 
 ### Banner
 Full-width alert at the top of the page: Oxide Red background with a strong white first line, for the "Kuku changed" warning. A quiet variant uses surface and text-2 for neutral notices.
