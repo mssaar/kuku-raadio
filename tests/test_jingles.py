@@ -37,14 +37,16 @@ def test_detect_ad_intervals_missing_assets(tmp_path):
 
 
 def test_assets_contain_all_jingles():
-    from kuku.jingles import ASSETS_DIR, load_audio, SAMPLE_RATE
+    import wave
+    from kuku.jingles import ASSETS_DIR
     wavs = list(ASSETS_DIR.glob("puhas_lopukoll_*.wav"))
     assert len(wavs) >= 6
     # Kõigi 4 saate saatepõhised täispikad tunnus-introd (>= 8s)
     for sid in (231, 209, 214, 111513):
         matches = list(ASSETS_DIR.glob(f"saade_{sid}_lopukoll_*.wav"))
         assert len(matches) >= 1
-        dur = len(load_audio(matches[0], sr=SAMPLE_RATE)) / SAMPLE_RATE
+        with wave.open(str(matches[0]), "rb") as w:
+            dur = w.getnframes() / w.getframerate()
         assert dur >= 8.0, f"Saate {sid} tunnus-intro on liiga lühike ({dur:.2f}s)"
     # Sponsorikõllid saadetele, millel on sponsori bumber vahetult pärast introt
     for sid in (231, 209, 214):
