@@ -37,14 +37,18 @@ def test_detect_ad_intervals_missing_assets(tmp_path):
 
 
 def test_assets_contain_all_jingles():
-    from kuku.jingles import ASSETS_DIR
+    from kuku.jingles import ASSETS_DIR, load_audio, SAMPLE_RATE
     wavs = list(ASSETS_DIR.glob("puhas_lopukoll_*.wav"))
     assert len(wavs) >= 6
-    # Kõigi 4 saate saatepõhised tunnus-introd
-    assert len(list(ASSETS_DIR.glob("saade_231_lopukoll_*.wav"))) >= 1  # Tarkade Klubi
-    assert len(list(ASSETS_DIR.glob("saade_209_lopukoll_*.wav"))) >= 1  # Digitund
-    assert len(list(ASSETS_DIR.glob("saade_214_lopukoll_*.wav"))) >= 1  # Buum
-    assert len(list(ASSETS_DIR.glob("saade_111513_lopukoll_*.wav"))) >= 1  # Jäljed gloobusel
+    # Kõigi 4 saate saatepõhised täispikad tunnus-introd (>= 8s)
+    for sid in (231, 209, 214, 111513):
+        matches = list(ASSETS_DIR.glob(f"saade_{sid}_lopukoll_*.wav"))
+        assert len(matches) >= 1
+        dur = len(load_audio(matches[0], sr=SAMPLE_RATE)) / SAMPLE_RATE
+        assert dur >= 8.0, f"Saate {sid} tunnus-intro on liiga lühike ({dur:.2f}s)"
+    # Sponsorikõllid saadetele, millel on sponsori bumber vahetult pärast introt
+    for sid in (231, 209, 214):
+        assert len(list(ASSETS_DIR.glob(f"saade_{sid}_sponsor_*.wav"))) >= 1
 
 
 def test_detect_ad_intervals_uses_show_specific_template(tmp_path, monkeypatch):
@@ -127,6 +131,144 @@ def test_detect_ad_intervals_cuts_start_and_end_by_theme_intro(tmp_path, monkeyp
     intervals_no_cut = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=False, show_id=231)
     assert intervals_no_cut[0] != (0, 466)
     assert intervals_no_cut[-1] == (3592, 3600)
+
+
+def test_detect_ad_intervals_robust_to_mid_jingle_stream_jitter(tmp_path, monkeypatch):
+    """Otse-eetri voos võib pika (9s) tunnus-intro keskel olla ~6ms ajaline hüpe; tuvastus ei tohi selle peale katkeda."""
+    assets_dir = tmp_path / "assets"
+    assets_dir.mkdir()
+    (assets_dir / "puhas_alguskoll.wav").write_bytes(b"dummy")
+    (assets_dir / "saade_111513_lopukoll_1.wav").write_bytes(b"dummy")
+
+    fake_audio = tmp_path / "test.mp3"
+    fake_audio.write_bytes(b"audio")
+
+    sr = 1000
+    monkeypatch.setattr("kuku.jingles.SAMPLE_RATE", sr)
+
+    rng = np.random.default_rng(123)
+    intro_wave = rng.standard_normal(sr * 9).astype(np.float32)
+    start_jingle_wave = rng.standard_normal(sr * 3).astype(np.float32)
+
+    # Lisame 6ms (6 sämplit) hüppe täpselt intro keskele (t=4.5s), nagu Jäljed gloobusel 19.11 vs 12.11
+    half = len(intro_wave) // 2
+    jittered_intro = np.concatenate([intro_wave[:half], np.zeros(6, dtype=np.float32), intro_wave[half:]])
+
+    full_audio = rng.standard_normal(sr * 3600).astype(np.float32) * 0.05
+    # Saate alguse intro (t=440s) + üks keskmine reklaamipaus (algus 1120s, lõpp-intro 1240s)
+    full_audio[440 * sr : 440 * sr + len(jittered_intro)] += jittered_intro * 5.0
+    full_audio[1120 * sr : 1120 * sr + len(start_jingle_wave)] += start_jingle_wave * 5.0
+    full_audio[1240 * sr : 1240 * sr + len(jittered_intro)] += jittered_intro * 5.0
+
+    def mock_load(path, sr=sr):
+        p = Path(path).name
+        if p == "saade_111513_lopukoll_1.wav":
+            return intro_wave
+        if p == "puhas_alguskoll.wav":
+            return start_jingle_wave
+        return full_audio
+
+    monkeypatch.setattr("kuku.jingles.load_audio", mock_load)
+
+    intervals = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=True, show_id=111513)
+    # Peab tuvastama algus-intro (440 + 9 = 449s), mitte langema vaikeajale 413s
+    assert intervals[0][0] == 0
+    assert 448 <= intervals[0][1] <= 450
+    # Peab tuvastama keskmise reklaamipausi lõpu (1240 + 9 = 1249s), mitte +90s fallback (1210s)
+    mid = [iv for iv in intervals if 1118 <= iv[0] <= 1122]
+    assert len(mid) == 1
+    assert 1248 <= mid[0][1] <= 1250
+
+
+def test_detect_ad_intervals_cuts_sponsor_bumper_when_present(tmp_path, monkeypatch):
+    """Kui saate tunnus-introle järgneb sponsori kõll (saade_{id}_sponsor_*.wav), lõigatakse ka see välja; kui mitte, ei lõigata saatejuttu."""
+    assets_dir = tmp_path / "assets"
+    assets_dir.mkdir()
+    (assets_dir / "puhas_alguskoll.wav").write_bytes(b"dummy")
+    (assets_dir / "saade_209_lopukoll_1.wav").write_bytes(b"dummy")
+    (assets_dir / "saade_209_sponsor_1.wav").write_bytes(b"dummy")
+
+    fake_audio = tmp_path / "test.mp3"
+    fake_audio.write_bytes(b"audio")
+
+    sr = 1000
+    monkeypatch.setattr("kuku.jingles.SAMPLE_RATE", sr)
+
+    rng = np.random.default_rng(77)
+    intro_wave = rng.standard_normal(sr * 8).astype(np.float32)
+    sponsor_wave = rng.standard_normal(sr * 5).astype(np.float32)
+    start_jingle_wave = rng.standard_normal(sr * 3).astype(np.float32)
+
+    # Juhtum 1: sponsor on nii alguses (449+8=457..462) kui ka keskmise pausi lõpus (1242+8=1250..1255)
+    audio_with_sponsor = rng.standard_normal(sr * 3600).astype(np.float32) * 0.05
+    audio_with_sponsor[449 * sr : 457 * sr] += intro_wave * 5.0
+    audio_with_sponsor[457 * sr : 462 * sr] += sponsor_wave * 5.0
+    audio_with_sponsor[1114 * sr : 1117 * sr] += start_jingle_wave * 5.0
+    audio_with_sponsor[1242 * sr : 1250 * sr] += intro_wave * 5.0
+    audio_with_sponsor[1250 * sr : 1255 * sr] += sponsor_wave * 5.0
+
+    # Juhtum 2: sponsor puudub (saade algab kohe peale introt 457s pealt)
+    audio_no_sponsor = rng.standard_normal(sr * 3600).astype(np.float32) * 0.05
+    audio_no_sponsor[449 * sr : 457 * sr] += intro_wave * 5.0
+
+    current_audio = [audio_with_sponsor]
+
+    def mock_load(path, sr=sr):
+        p = Path(path).name
+        if p == "saade_209_lopukoll_1.wav":
+            return intro_wave
+        if p == "saade_209_sponsor_1.wav":
+            return sponsor_wave
+        if p == "puhas_alguskoll.wav":
+            return start_jingle_wave
+        return current_audio[0]
+
+    monkeypatch.setattr("kuku.jingles.load_audio", mock_load)
+
+    iv_with = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=True, show_id=209)
+    assert iv_with[0] == (0, 462)
+    mid = [iv for iv in iv_with if iv[0] == 1114]
+    assert len(mid) == 1
+    assert mid[0] == (1114, 1255)
+
+    current_audio[0] = audio_no_sponsor
+    iv_without = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=True, show_id=209)
+    assert iv_without[0] == (0, 457)
+
+
+def test_detect_ad_intervals_rounds_up_fractional_intro_end(tmp_path, monkeypatch):
+    """Kui intro lõpeb nt 457.4s peal, ümardatakse üles 458s peale, et intro viimane silp ei jääks sisse."""
+    assets_dir = tmp_path / "assets"
+    assets_dir.mkdir()
+    (assets_dir / "puhas_alguskoll.wav").write_bytes(b"dummy")
+    (assets_dir / "saade_214_lopukoll_1.wav").write_bytes(b"dummy")
+
+    fake_audio = tmp_path / "test.mp3"
+    fake_audio.write_bytes(b"audio")
+
+    sr = 1000
+    monkeypatch.setattr("kuku.jingles.SAMPLE_RATE", sr)
+
+    rng = np.random.default_rng(99)
+    intro_wave = rng.standard_normal(int(sr * 8.4)).astype(np.float32)
+    start_jingle_wave = rng.standard_normal(sr * 3).astype(np.float32)
+
+    full_audio = rng.standard_normal(sr * 3600).astype(np.float32) * 0.05
+    # Intro 449.0s .. 457.4s -> peab lõikama 458s pealt (mitte 457s)
+    full_audio[449 * sr : 449 * sr + len(intro_wave)] += intro_wave * 5.0
+
+    def mock_load(path, sr=sr):
+        p = Path(path).name
+        if p == "saade_214_lopukoll_1.wav":
+            return intro_wave
+        if p == "puhas_alguskoll.wav":
+            return start_jingle_wave
+        return full_audio
+
+    monkeypatch.setattr("kuku.jingles.load_audio", mock_load)
+
+    intervals = detect_ad_intervals(fake_audio, assets_dir=assets_dir, cut_start=True, show_id=214)
+    assert intervals[0] == (0, 458)
 
 
 

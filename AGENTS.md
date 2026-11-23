@@ -36,14 +36,16 @@ Isiklik Raadio Kuku saadete arhiiv ja otse-eetri salvestaja. Kasutaja saab veebi
 - Iga muudatuse järel tuleb käivitada nii Pythoni (`pytest`) kui ka JS (`npm test`) testid.
 
 ## 6. Reklaamikõllide ja lõikamise reeglid
-- **Saatepõhised lõpukõllid ja tunnus-introd (`kuku/assets/saade_{show_id}_lopukoll_*.wav`):** Kõigil neljal jälgitaval saatel on nüüd oma saatepõhine tunnus-intro ja lõpukõll:
-  - Tarkade Klubi (`231`): `saade_231_lopukoll_1.wav`
-  - Digitund (`209`): `saade_209_lopukoll_1.wav`
-  - Buum (`214`): `saade_214_lopukoll_1.wav`
-  - Jäljed gloobusel (`111513`): `saade_111513_lopukoll_1.wav`
+- **Saatepõhised lõpukõllid ja tunnus-introd (`kuku/assets/saade_{show_id}_lopukoll_*.wav`):** Kõigil neljal jälgitaval saatel on oma täispikk saatepõhine tunnus-intro (8,4–9,2 s) ning sponsoriga saadetel eraldi sponsori bumber (`kuku/assets/saade_{show_id}_sponsor_*.wav`):
+  - Tarkade Klubi (`231`): `saade_231_lopukoll_1.wav` (8,75 s) + `saade_231_sponsor_1.wav` (7,15 s, Postimehe raamatukirjastus)
+  - Digitund (`209`): `saade_209_lopukoll_1.wav` (8,40 s) + `saade_209_sponsor_1.wav` (5,20 s, Telia)
+  - Buum (`214`): `saade_214_lopukoll_1.wav` (8,95 s) + `saade_214_sponsor_1.wav` (3,50 s, SEB Pank)
+  - Jäljed gloobusel (`111513`): `saade_111513_lopukoll_1.wav` (9,15 s; sponsori bumber puudub)
   Kui saatele on lisatud oma saatepõhine lõpukõll või tunnus-intro, kasutatakse salvestamisel ja recut'imisel AINULT selle saate omi. Kui saatele pole spetsiifilist kõlli sätestatud, otsitakse üldisest hunnikust (`puhas_lopukoll_*.wav`).
+- **Voohüppekindel tuvastus (`_robust_find_peaks`):** Pikemate kui 4,5 s etalonide puhul jagatakse kõll 2,5 s lõikudeks ±30 ms nihketaluvusega, et üksikud otse-eetri MP3-voo kaadrihüpped (nt ~5 ms keset kõlli) ei rikuks tuvastust.
+- **Sponsori bumberi eemaldamine (`_extend_with_sponsor`):** Kui tunnus-introle järgneb vahetult saate sponsori kõll, pikendatakse lõikepunkti (nii saate alguses kui ka reklaamipauside lõpus) sponsori lõpuni; sponsori puudumisel või muutumisel lõigatakse ainult tunnus-intro ilma saatejuttu riivamata.
 - **Otsinguaken:** Lõpukõlli otsitakse vahemikust `[start_sec + 60s, start_sec + 270s]` (kuni 4,5 min pärast pausi algust).
 - **Saate alguse ja lõpu lõikamine tunnus-intro järgi:**
-  - Kui saatele on olemas oma tunnus-intro, otsitakse saate algust aknast `[180s, 600s]`. Uudised, eelreklaamid ja tunnus-intro ise lõigatakse välja (`start_cut_sec = intro_algus + intro_kestus`), nii et saade algab puhtalt vahetult jutu algusest.
+  - Kui saatele on olemas oma tunnus-intro, otsitakse saate algust aknast `[180s, 600s]`. Uudised, eelreklaamid, tunnus-intro ja vahetult järgnev sponsori bumber lõigatakse välja (ümardades üles täissekundini), nii et saade algab puhtalt vahetult jutu algusest.
   - Saate lõppu otsitakse aknast `[3300s, 3600s]`. Tunnus-intro tuvastamisel lastakse lõputunnusel kõlada ning saade lõpeb vahetult enne täistunni uudiseid (u 3595s).
   - Kui saatele pole spetsiifilist introt sätestatud või seda ei tuvastata, jäävad kasutusse vaikeajad `(0, 413)` (6:53) ja `3543` (59:03, +80s pikendatud).

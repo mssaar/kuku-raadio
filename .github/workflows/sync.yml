@@ -22,9 +22,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 330
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    outputs:
+      uploaded: ${{ steps.upload.outcome == 'success' }}
     steps:
       # alati haru värskeim seis (järjekorras ootav käivitus ei tohi alustada vanast commitist)
       - uses: actions/checkout@v4
@@ -63,13 +62,22 @@ jobs:
             fi
             git push origin HEAD:main
           fi
-      - uses: actions/upload-pages-artifact@v3
+      - id: upload
+        uses: actions/upload-pages-artifact@v3
         if: always() && steps.save.outcome == 'success'
         with:
           path: site
-      - id: deploy
-        if: always() && steps.save.outcome == 'success'
-        uses: actions/deploy-pages@v4
       - name: Märgi sync'i viga
         if: steps.sync.outcome == 'failure'
         run: exit 1
+
+  deploy:
+    needs: sync
+    if: always() && needs.sync.outputs.uploaded == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
