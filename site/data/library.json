@@ -177,6 +177,14 @@
    "name": "Jäljed gloobusel",
    "episodes": [
     {
+     "id": 1795683602,
+     "title": "Jäljed gloobusel (26.11.2026)",
+     "published_at": "2026-11-26T09:00:02Z",
+     "expires_at": "2027-05-27T09:00:02Z",
+     "duration_seconds": 2536,
+     "url": "https://github.com/mssaar/kuku-raadio/releases/download/saade-111513/1795683602.mp3"
+    },
+    {
      "id": 1795078802,
      "title": "Jäljed gloobusel (19.11.2026)",
      "published_at": "2026-11-19T09:00:02Z",
